@@ -153,6 +153,16 @@ MyGame.graphics = (function(){
         function buildRectangleList(newBrickBox){
             let rectangleList = [];
             let brickUnit = canvas.width/newBrickBox.width;
+            let borderRectangle = {
+                x: 0,
+                y: 0,
+                width: canvas.width,
+                height: canvas.height,
+                rotation: 0,
+                fillStyle: 'rgba(0,0,0,0)',
+                strokeStyle: newBrickBox.brickList[0].fillStyle
+            };
+            rectangleList.push(borderRectangle);
             for (let i = 0; i < newBrickBox.brickList.length; ++i){
                     //Give the necessary components to the Rectangle function.
                     rectangleList.push({

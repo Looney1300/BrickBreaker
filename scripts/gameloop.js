@@ -26,7 +26,7 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
     //Test Shapes
 
     //generate the default gameModel
-    let gameModel = MyGame.gameModel(breakerMaker.generateLevel(10, 5, colorList));
+    let gameModel = MyGame.gameModel(breakerMaker.generateLevel(15, 5, colorList));
 
 
     //----------------------------------------------

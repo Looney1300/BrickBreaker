@@ -4,10 +4,10 @@ MyGame.breakerMaker = (function(){
     function generateLevel(widthInBricks, heightInBricks, colorList){
 
         function brickListGenerator(){
-            let r = Math.round((Math.random()*1000)) % colorList.length;
             let brickList = [];
             for (let x=0; x < widthInBricks; ++x){
                 for (let y=0; y < heightInBricks; ++y){
+                    let r = Math.round((Math.random()*1000)) % colorList.length;
                     brickList.push({
                         rotation: 0,
                         x: x,
