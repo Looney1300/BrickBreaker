@@ -29,6 +29,7 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
         strokeStyle: 'rgba(0, 150, 0, 1)',
         width: 2,
         height: .5,
+        rate: 2500
     }
 
     //Ball radius in width and height

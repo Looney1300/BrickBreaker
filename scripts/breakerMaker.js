@@ -1,6 +1,5 @@
 MyGame.breakerMaker = (function(){
     
-    //We need a level generator function.
     function generateLevel(widthInBricks, heightInBricks, colorList){
 
         function brickListGenerator(){
@@ -13,7 +12,8 @@ MyGame.breakerMaker = (function(){
                         x: x,
                         y: y,
                         fillStyle: colorList[r%colorList.length].fill,
-                        strokeStyle: colorList[r%colorList.length].stroke
+                        strokeStyle: colorList[r%colorList.length].stroke,
+                        isHit: false,
                     });
                 }
             }

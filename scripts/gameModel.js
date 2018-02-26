@@ -9,7 +9,9 @@ MyGame.gameModel = function(paddle, ball, colorList){
     let gameTime = 0;
     let levelCount = 1;
     let level = breakerMaker.generateLevel(gameWidthInBricks, gameHeightInBricks, colorList);
-
+    
+    
+    
     //Game graphics members
     let brickLevel = graphics.BrickLevel(level);
     let paddleGraphic = graphics.Paddle(gameWidthInBricks, gameHeightInBricks, paddle);
@@ -18,6 +20,16 @@ MyGame.gameModel = function(paddle, ball, colorList){
     //let levelTracker = graphics.Text(levelCount);
     //let gameTimeDisplay = graphics.Text(gameTime);
 
+
+    //Building collision test groups by brick column
+    let testGroups = [];
+    for (let j=0; j < gameWidthInBricks; ++j){
+        let columnj = []
+        for (let i=0; i < gameHeightInBricks; ++i){
+            columnj.push(level[i]);
+        }
+    }
+
     that.drawGame = function(){
         graphics.clear();
         brickLevel.draw();
@@ -25,7 +37,40 @@ MyGame.gameModel = function(paddle, ball, colorList){
         ballGraphic.draw();
     }
 
-    function updateBallLocation(elapsedTime){
+    function detectCollisionWithBrick(){
+        let brickList = level.brickList;
+        let toDelete = [];
+        for (let i=0; i < level.brickList; level.brickList.length){
+            if (brickList[i].x >= ball.centerX + ball.radius && brickList[i].x <= ball.centerX + ball.radius){
+                if (brickList[i].y >= ball.centerY + ball.radius && brickList[i].y <= ball.centerY + ball.radius){
+                    //Collision is detected.
+                    toDelete.push(i);
+                }
+            }
+        }
+        for (let i=0; i < toDelete.length; ++i){
+            console.log('splicing brick: ', i);
+            brickList.splice(i,1);
+        }
+    }
+
+    function detectCollisionWithWall(){
+        if (ball.centerX - ball.radius <= 0 || ball.centerX + ball.radius >= CANVASWIDTH){
+            ball.xRate *= -1;
+        }
+        if (ball.centerY - ball.radius <= 0 || ball.centerY + ball.radius >= CANVASHEIGHT){
+            ball.yRate *= -1;
+        }
+    }
+
+
+    function updateCollisions(){
+        detectCollisionWithBrick();
+        detectCollisionWithWall();
+    }
+
+    
+    function updateBall(elapsedTime){
         ball.centerX += ball.xRate * elapsedTime/1000;
         ball.centerY += ball.yRate * elapsedTime/1000;
     }
@@ -48,20 +93,19 @@ MyGame.gameModel = function(paddle, ball, colorList){
 
     that.movePaddleRight = function(elapsedTime){
         if (isInRightBound(paddle)){
-            let rate = 1000;
-            paddle.x += elapsedTime/1000 * rate;
+            paddle.x += elapsedTime/1000 * paddle.rate;
         }
     }
     
     that.movePaddleLeft = function(elapsedTime){
         if (isInLeftBound(paddle)){
-            let rate = 1000;
-            paddle.x -= elapsedTime/1000 * rate;
+            paddle.x -= elapsedTime/1000 * paddle.rate;
         }
     }
 
     that.updateGameModel = function(elapsedTime){
-        updateBallLocation(elapsedTime);
+        updateBall(elapsedTime);
+        updateCollisions();
     }
 
     return that;
