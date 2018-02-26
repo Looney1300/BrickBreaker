@@ -23,8 +23,8 @@ MyGame.breakerMaker = (function(){
         let brickList = brickListGenerator();
 
         let level = {
-            width: 10,
-            height: 5,
+            width: widthInBricks,
+            height: heightInBricks,
             brickList: brickList
         }
 

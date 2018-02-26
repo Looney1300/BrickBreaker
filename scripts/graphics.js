@@ -157,7 +157,7 @@ MyGame.graphics = (function(){
                     //Give the necessary components to the Rectangle function.
                     rectangleList.push({
                         x: newBrickBox.brickList[i].x * brickUnit,
-                        y: 2/5 * newBrickBox.brickList[i].y * brickUnit,
+                        y: newBrickBox.brickList[i].y * 2/5 * brickUnit,
                         width: brickUnit,
                         height: 2/5 * brickUnit,
                         rotation: newBrickBox.brickList[i].rotation,
@@ -165,15 +165,12 @@ MyGame.graphics = (function(){
                         strokeStyle: newBrickBox.brickList[i].strokeStyle
                     });
             }
-            //A maze's maxX,Y is the width and height.
-            let rectangles = {
-                rectangleList: rectangleList
-           };
-            return rectangles;
+            return rectangleList;
         }
 
         that.draw = function(){
-            Rectangles(buildRectangleList(level));
+            let rs = Rectangles(buildRectangleList(level));
+            rs.draw();
         };
         return that;
     }

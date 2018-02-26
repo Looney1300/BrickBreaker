@@ -17,50 +17,13 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
     //-------------------------------------------
     //Generate default level
     let colorList = [
-        {fill: 'rgba(100, 100, 100, 1)', stroke: 'rgba(10, 10, 10, 1)'},
-        {fill: 'rgba(150, 150, 150, 1)', stroke: 'rgba(10, 10, 10, 1)'},
-        {fill: 'rgba(200, 200, 200, 1)', stroke: 'rgba(10, 10, 10, 1)'},
-        {fill: 'rgba(50, 50, 50, 1)', stroke: 'rgba(10, 10, 10, 1)'},
-        // {fill: 'rgba()', stroke: 'rgba()'},
-        // {fill: 'rgba()', stroke: 'rgba()'},
-        // {fill: 'rgba()', stroke: 'rgba()'},
-        // {fill: 'rgba()', stroke: 'rgba()'},
-        // {fill: 'rgba()', stroke: 'rgba()'},
-        // {fill: 'rgba()', stroke: 'rgba()'},
-        // {fill: 'rgba()', stroke: 'rgba()'}
+        {fill: 'rgba(100, 100, 100, 1)', stroke: 'rgba(255, 255, 255, 1)'},
+        {fill: 'rgba(150, 150, 150, 1)', stroke: 'rgba(255, 255, 255, 1)'},
+        {fill: 'rgba(200, 200, 200, 1)', stroke: 'rgba(255, 255, 255, 1)'},
+        {fill: 'rgba(50, 50, 50, 1)', stroke: 'rgba(255, 255, 255, 1)'},
     ]
 
     //Test Shapes
-    let brick = {
-        rotation: 0,
-        x: 0,
-        y: 0,
-        fillStyle: colorList[0].fill,
-        strokeStyle: colorList[0].stroke
-    }
-
-    let level = {
-        width: 10,
-        height: 5,
-        brickList: [brick]
-    }
-
-    let l = graphics.BrickLevel(level);
-
-    let brickUnit = 20;
-
-    let r = {
-        x: brick.x * brickUnit,
-        y: 2/5 * brick.y * brickUnit,
-        width: brickUnit,
-        height: 2/5 * brickUnit,
-        rotation: brick.rotation,
-        fillStyle: brick.fillStyle,
-        strokeStyle: brick.strokeStyle
-    }
-
-    let r1 = graphics.Rectangle(r);
-
 
     //generate the default gameModel
     let gameModel = MyGame.gameModel(breakerMaker.generateLevel(10, 5, colorList));
@@ -124,8 +87,6 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
 
     function render(elapsedTime){
         graphics.clear();
-        r1.draw();
-
         //Draw the game
         gameModel.drawGame();
     }
