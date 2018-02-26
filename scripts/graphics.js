@@ -45,6 +45,7 @@ MyGame.graphics = (function(){
             context.fillStyle = spec.fillStyle;
             context.fillRect(spec.x, spec.y, spec.width, spec.height);
             context.strokeStyle = spec.strokeStyle;
+            context.lineWidth = 2;
             context.strokeRect(spec.x, spec.y, spec.width, spec.height);
             //4. Undo translations and rotations of canvas.
             context.restore();
@@ -136,6 +137,26 @@ MyGame.graphics = (function(){
         return that;
     }
 
+    /*
+    Circle takes a spec and draws a circle from it
+     centerX
+     centerY
+     radius
+    */
+    function Circle(spec){
+        let that = {};
+        that.draw = function(){
+            context.beginPath();
+            context.arc(spec.centerX, spec.centerY, spec.radius, 0, 2*3.14159265);
+            context.closePath();
+            context.strokeStyle = spec.strokeStyle;
+            context.stroke();
+            context.fillStyle = spec.fillStyle;
+            context.fill();
+        }
+        return that;
+    }
+
     //TODO: make a curvy line drawer.
     function Curves(curveList){ }
 
@@ -182,15 +203,27 @@ MyGame.graphics = (function(){
     function Paddle(width, height, paddle){
         let brickUnit = canvas.width/width;
         let gapBelowPaddle = brickUnit * (2/5 + paddle.height);
-        return Rectangle({
-            rotation: 0,
-            x: canvas.width/2 - (brickUnit * paddle.width)/2,
-            y: canvas.height - gapBelowPaddle,
-            width: brickUnit * paddle.width,
-            height: 2/5 * brickUnit * paddle.height,
-            fillStyle: paddle.fillStyle,
-            strokeStyle: paddle.strokeStyle
-        })
+        paddle.rotation = 0;
+        paddle.x = canvas.width/2 - (brickUnit * paddle.width)/2;
+        paddle.y = canvas.height - gapBelowPaddle;
+        paddle.width = brickUnit * paddle.width;
+        paddle.height = 2/5 * brickUnit * paddle.height;
+        return Rectangle(paddle);
+    }
+
+    /*
+    Ball creates a rectangle as a ball.
+    */
+    function Ball(width, ball){
+        let brickUnit = canvas.width/width;
+        ball.rotation = 0;
+        //Starting x,y
+        ball.centerX = canvas.width/2;
+        ball.centerY = canvas.height - 3 * brickUnit;
+        ball.width = ball.radius * 2 * brickUnit;
+        ball.height = ball.radius * 2 * brickUnit;
+        ball.radius = ball.radius * brickUnit;
+        return Circle(ball);
     }
 
     function assetToTextureSpec(character, maze){
@@ -203,15 +236,16 @@ MyGame.graphics = (function(){
         };
         return texture;
     }
-
     
     return {
         clear: clear,
         Rectangle: Rectangle,
         Texture: Texture,
         Lines: Lines,
+        Circle: Circle,
         BrickLevel: BrickLevel,
         Paddle: Paddle,
+        Ball: Ball,
         assetToTextureSpec: assetToTextureSpec
     };
 

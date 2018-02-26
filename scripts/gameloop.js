@@ -17,12 +17,13 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
     //-------------------------------------------
     //Generate default level
     let colorList = [
-        {fill: 'rgba(100, 100, 100, 1)', stroke: 'rgba(255, 255, 255, 1)'},
-        {fill: 'rgba(150, 150, 150, 1)', stroke: 'rgba(255, 255, 255, 1)'},
-        {fill: 'rgba(200, 200, 200, 1)', stroke: 'rgba(255, 255, 255, 1)'},
-        {fill: 'rgba(50, 50, 50, 1)', stroke: 'rgba(255, 255, 255, 1)'},
+        {fill: 'rgba(100, 100, 100, 1)', stroke: 'rgba(0, 0, 0, 1)'},
+        {fill: 'rgba(150, 150, 150, 1)', stroke: 'rgba(0, 0, 0, 1)'},
+        {fill: 'rgba(200, 200, 200, 1)', stroke: 'rgba(0, 0, 0, 1)'},
+        {fill: 'rgba(50, 50, 50, 1)', stroke: 'rgba(0, 0, 0, 1)'},
     ]
 
+    //Starting paddle width and height in brick units.
     let paddle = {
         fillStyle: 'rgba(0, 255, 0, 1)',
         strokeStyle: 'rgba(0, 150, 0, 1)',
@@ -30,14 +31,22 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
         height: .5,
     }
 
+    //Ball radius in width and height
+    let ball = {
+        fillStyle: 'rgba(255,255,255,1)',
+        strokeStyle: 'rgba(255,255,255,1)',
+        xRate: 50,
+        yRate: -100,
+        radius: .5
+    }
+
     //generate the default gameModel
-    let gameModel = MyGame.gameModel(paddle, colorList);
+    let gameModel = MyGame.gameModel(paddle, ball, colorList);
 
 
     //----------------------------------------------
     //                  Handlers
     //----------------------------------------------
-
 
     function toggleKeyBindings(){
         // keyboard.registerKey(KeyEvent['DOM_VK_UP'], moveCharacterUp);
@@ -86,22 +95,20 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
     }
 
     let countDownUpdate = function(elapsedTime){
-        //gameModel.updateGameTime(elapsedTime);
-        updateFPS(elapsedTime);
     }
     
     let menuUpdate = function(elapsedTime){
-        
     }
     
     function gameModelUpdate(elapsedTime){
-        
+        updateFPS(elapsedTime);
+        gameModel.updateGameModel(elapsedTime);        
     }
     
     //TODO: this should start at menuUpdate, but for easy 
     //development, I will initialize it with gameUpdate.
     // let update = menuUpdate;
-    let update = countDownUpdate;
+    let update = gameModelUpdate;
 
     function render(elapsedTime){
         //Draw the game (clearing the screen is handled by the drawGame function)
