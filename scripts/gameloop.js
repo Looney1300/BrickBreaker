@@ -23,10 +23,15 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
         {fill: 'rgba(50, 50, 50, 1)', stroke: 'rgba(255, 255, 255, 1)'},
     ]
 
-    //Test Shapes
+    let paddle = {
+        fillStyle: 'rgba(0, 255, 0, 1)',
+        strokeStyle: 'rgba(0, 150, 0, 1)',
+        width: 2,
+        height: .5,
+    }
 
     //generate the default gameModel
-    let gameModel = MyGame.gameModel(breakerMaker.generateLevel(15, 5, colorList));
+    let gameModel = MyGame.gameModel(paddle, colorList);
 
 
     //----------------------------------------------
@@ -48,8 +53,8 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
     //---------------------------------------------------------------
 
     //Default key registration to handlers
-    keyboard.registerKey(KeyEvent['DOM_VK_RIGHT'], gameModel.moveCharacterRight);
-    keyboard.registerKey(KeyEvent['DOM_VK_LEFT'], gameModel.moveCharacterLeft);
+    keyboard.registerKey(KeyEvent['DOM_VK_RIGHT'], gameModel.movePaddleRight);
+    keyboard.registerKey(KeyEvent['DOM_VK_LEFT'], gameModel.movePaddleLeft);
 
 
     //----------------------------------------------
@@ -77,17 +82,29 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
     //-----------------------------------------------------
 
     function processInput(elapsedTime){
-        //keyboard.processInput(elapsedTime);
+        keyboard.processInput(elapsedTime);
     }
 
-    function update(elapsedTime){
+    let countDownUpdate = function(elapsedTime){
         //gameModel.updateGameTime(elapsedTime);
         updateFPS(elapsedTime);
     }
+    
+    let menuUpdate = function(elapsedTime){
+        
+    }
+    
+    function gameModelUpdate(elapsedTime){
+        
+    }
+    
+    //TODO: this should start at menuUpdate, but for easy 
+    //development, I will initialize it with gameUpdate.
+    // let update = menuUpdate;
+    let update = countDownUpdate;
 
     function render(elapsedTime){
-        graphics.clear();
-        //Draw the game
+        //Draw the game (clearing the screen is handled by the drawGame function)
         gameModel.drawGame();
     }
 

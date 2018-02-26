@@ -153,21 +153,12 @@ MyGame.graphics = (function(){
         function buildRectangleList(newBrickBox){
             let rectangleList = [];
             let brickUnit = canvas.width/newBrickBox.width;
-            let borderRectangle = {
-                x: 0,
-                y: 0,
-                width: canvas.width,
-                height: canvas.height,
-                rotation: 0,
-                fillStyle: 'rgba(0,0,0,0)',
-                strokeStyle: newBrickBox.brickList[0].fillStyle
-            };
-            rectangleList.push(borderRectangle);
+            let gapAboveBricks = 6/5*brickUnit;
             for (let i = 0; i < newBrickBox.brickList.length; ++i){
                     //Give the necessary components to the Rectangle function.
                     rectangleList.push({
                         x: newBrickBox.brickList[i].x * brickUnit,
-                        y: newBrickBox.brickList[i].y * 2/5 * brickUnit,
+                        y: newBrickBox.brickList[i].y * 2/5 * brickUnit + gapAboveBricks,
                         width: brickUnit,
                         height: 2/5 * brickUnit,
                         rotation: newBrickBox.brickList[i].rotation,
@@ -183,6 +174,23 @@ MyGame.graphics = (function(){
             rs.draw();
         };
         return that;
+    }
+
+    /*
+    Paddle draws a rectangle in the bottom center of the game.
+    */
+    function Paddle(width, height, paddle){
+        let brickUnit = canvas.width/width;
+        let gapBelowPaddle = brickUnit * (2/5 + paddle.height);
+        return Rectangle({
+            rotation: 0,
+            x: canvas.width/2 - (brickUnit * paddle.width)/2,
+            y: canvas.height - gapBelowPaddle,
+            width: brickUnit * paddle.width,
+            height: 2/5 * brickUnit * paddle.height,
+            fillStyle: paddle.fillStyle,
+            strokeStyle: paddle.strokeStyle
+        })
     }
 
     function assetToTextureSpec(character, maze){
@@ -203,6 +211,7 @@ MyGame.graphics = (function(){
         Texture: Texture,
         Lines: Lines,
         BrickLevel: BrickLevel,
+        Paddle: Paddle,
         assetToTextureSpec: assetToTextureSpec
     };
 
