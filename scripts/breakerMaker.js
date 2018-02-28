@@ -13,7 +13,6 @@ MyGame.breakerMaker = (function(){
                         y: y,
                         fillStyle: colorList[r%colorList.length].fill,
                         strokeStyle: colorList[r%colorList.length].stroke,
-                        isHit: false,
                     });
                 }
             }

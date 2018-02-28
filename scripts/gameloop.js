@@ -29,16 +29,16 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
         strokeStyle: 'rgba(0, 150, 0, 1)',
         width: 2,
         height: .5,
-        rate: 2500
+        rate: 1750
     }
 
     //Ball radius in width and height
     let ball = {
         fillStyle: 'rgba(255,255,255,1)',
         strokeStyle: 'rgba(255,255,255,1)',
-        xRate: 50,
-        yRate: -100,
-        radius: .5
+        xRate: 500,
+        yRate: -500,
+        radius: .2
     }
 
     //generate the default gameModel

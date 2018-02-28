@@ -174,7 +174,7 @@ MyGame.graphics = (function(){
         function buildRectangleList(newBrickBox){
             let rectangleList = [];
             let brickUnit = canvas.width/newBrickBox.width;
-            let gapAboveBricks = 6/5*brickUnit;
+            let gapAboveBricks = newBrickBox.gapAbove;
             for (let i = 0; i < newBrickBox.brickList.length; ++i){
                     //Give the necessary components to the Rectangle function.
                     rectangleList.push({

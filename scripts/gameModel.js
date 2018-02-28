@@ -6,11 +6,12 @@ MyGame.gameModel = function(paddle, ball, colorList){
     let breakerMaker = MyGame.breakerMaker;
     let gameWidthInBricks = 15;
     let gameHeightInBricks = 5;
+    let brickUnit = CANVASWIDTH/gameWidthInBricks;
+    let gapAbove = 6/5*brickUnit;
     let gameTime = 0;
     let levelCount = 1;
     let level = breakerMaker.generateLevel(gameWidthInBricks, gameHeightInBricks, colorList);
-    
-    
+    level.gapAbove = gapAbove;
     
     //Game graphics members
     let brickLevel = graphics.BrickLevel(level);
@@ -19,7 +20,6 @@ MyGame.gameModel = function(paddle, ball, colorList){
     //TODO: 
     //let levelTracker = graphics.Text(levelCount);
     //let gameTimeDisplay = graphics.Text(gameTime);
-
 
     //Building collision test groups by brick column
     let testGroups = [];
@@ -39,36 +39,41 @@ MyGame.gameModel = function(paddle, ball, colorList){
 
     function detectCollisionWithBrick(){
         let brickList = level.brickList;
-        let toDelete = [];
-        for (let i=0; i < level.brickList; level.brickList.length){
-            if (brickList[i].x >= ball.centerX + ball.radius && brickList[i].x <= ball.centerX + ball.radius){
-                if (brickList[i].y >= ball.centerY + ball.radius && brickList[i].y <= ball.centerY + ball.radius){
-                    //Collision is detected.
-                    toDelete.push(i);
+        for (let i = (brickList.length-1); i >= 0; --i){
+            brickX1 = brickUnit * brickList[i].x;
+            brickY1 = 2/5 * brickUnit * brickList[i].y + gapAbove;
+            brickX2 = brickUnit * (brickList[i].x + 1)
+            brickY2 = 2/5 * brickUnit * (brickList[i].y + 1) + gapAbove;
+            ballX1 = ball.centerX - ball.radius;
+            ballY1 = ball.centerY - ball.radius;
+            ballX2 = ball.centerX + ball.radius;
+            ballY2 = ball.centerY + ball.radius;
+            if (brickX1 < ballX2 && brickX2 > ballX1){
+                if(brickY1 < ballY2 && brickY2 > ballY1){
+                    brickList.splice(i,1);
                 }
             }
         }
-        for (let i=0; i < toDelete.length; ++i){
-            console.log('splicing brick: ', i);
-            brickList.splice(i,1);
-        }
     }
 
-    function detectCollisionWithWall(){
+    function reflectCollisionWithWall(){
         if (ball.centerX - ball.radius <= 0 || ball.centerX + ball.radius >= CANVASWIDTH){
             ball.xRate *= -1;
         }
-        if (ball.centerY - ball.radius <= 0 || ball.centerY + ball.radius >= CANVASHEIGHT){
+        if (ball.centerY - ball.radius <= 0){
             ball.yRate *= -1;
         }
+        if (ball.centerY + ball.radius >= CANVASHEIGHT){
+            ball.yRate *= -1;
+            return false;
+        }
+        return true;
     }
-
 
     function updateCollisions(){
         detectCollisionWithBrick();
-        detectCollisionWithWall();
+        reflectCollisionWithWall();
     }
-
     
     function updateBall(elapsedTime){
         ball.centerX += ball.xRate * elapsedTime/1000;
@@ -81,14 +86,6 @@ MyGame.gameModel = function(paddle, ball, colorList){
 
     function isInLeftBound(object){
         return object.x > 0;
-    }
-
-    function isInTopBound(object){
-        return object.y > 0;
-    }
-
-    function isInBottomBound(object){
-        return (object.y + object.height) > CANVASHEIGHT;
     }
 
     that.movePaddleRight = function(elapsedTime){
