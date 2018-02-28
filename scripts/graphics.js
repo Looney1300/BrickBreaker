@@ -202,10 +202,9 @@ MyGame.graphics = (function(){
     */
     function Paddle(width, height, paddle){
         let brickUnit = canvas.width/width;
-        let gapBelowPaddle = brickUnit * (2/5 + paddle.height);
         paddle.rotation = 0;
         paddle.x = canvas.width/2 - (brickUnit * paddle.width)/2;
-        paddle.y = canvas.height - gapBelowPaddle;
+        paddle.y = canvas.height - paddle.gapBelowPaddle;
         paddle.width = brickUnit * paddle.width;
         paddle.height = 2/5 * brickUnit * paddle.height;
         return Rectangle(paddle);

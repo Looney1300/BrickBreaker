@@ -8,10 +8,16 @@ MyGame.gameModel = function(paddle, ball, colorList){
     let gameHeightInBricks = 5;
     let brickUnit = CANVASWIDTH/gameWidthInBricks;
     let gapAbove = 6/5*brickUnit;
+    paddle.gapBelowPaddle = brickUnit * (2/5 + paddle.height);
     let gameTime = 0;
     let levelCount = 1;
     let level = breakerMaker.generateLevel(gameWidthInBricks, gameHeightInBricks, colorList);
     level.gapAbove = gapAbove;
+    ball.xRate = ball.rate * Math.cos(Math.PI/4);
+    ball.yRate = -1 * ball.rate * Math.sin(Math.PI/4);
+    let Xrate = ball.xRate;
+    let Yrate = ball.yRate;
+
     
     //Game graphics members
     let brickLevel = graphics.BrickLevel(level);
@@ -51,6 +57,7 @@ MyGame.gameModel = function(paddle, ball, colorList){
 
             if (brickX1 < ballX2 && brickX2 > ballX1){
                 if (brickY1 < ballY2 && brickY2 > ballY1){
+                    console.log('detected brick collision');
                     brickList.splice(i,1);
                     //Checking how to reflect the ball after hitting a brick
                     // if (brickX1 > ballX1 || brickX2 < ballX2){
@@ -63,7 +70,27 @@ MyGame.gameModel = function(paddle, ball, colorList){
         }
     }
 
-    function reflectCollisionWithWall(){
+    function detectCollisionWithPaddle(){
+        paddleCenterX = paddle.x + 1/2 * paddle.width;
+        paddleX1 = paddle.x;
+        paddleY1 = paddle.y;
+        paddleX2 = paddle.x + paddle.width;
+        paddleY2 = paddle.y + paddle.height;
+        ballX1 = ball.centerX - ball.radius;
+        ballY1 = ball.centerY - ball.radius;
+        ballX2 = ball.centerX + ball.radius;
+        ballY2 = ball.centerY + ball.radius;
+
+        if (paddleX1 < ballX2 && paddleX2 > ballX1){
+            if (paddleY1 < ballY2 && paddleY2 > ballY1){
+                let weight = 2 * (paddleCenterX - ball.centerX)/(paddle.width);
+                ball.xRate += paddle.reflectance * weight * ball.rate * -1;
+                ball.yRate *= -1;
+            }
+        }
+    }
+
+    function detectCollisionWithWall(){
         if (ball.centerX - ball.radius <= 0 || ball.centerX + ball.radius >= CANVASWIDTH){
             ball.xRate *= -1;
         }
@@ -78,8 +105,12 @@ MyGame.gameModel = function(paddle, ball, colorList){
     }
 
     function updateCollisions(){
-        detectCollisionWithBrick();
-        reflectCollisionWithWall();
+        if (ball.centerY < gapAbove + 2/5 * brickUnit * (gameHeightInBricks + 1) + ball.radius){
+            detectCollisionWithBrick();
+        }else if (ball.centerY > CANVASWIDTH - paddle.gapBelowPaddle - paddle.width*brickUnit){
+            detectCollisionWithPaddle();
+        }
+        detectCollisionWithWall();
     }
     
     function updateBall(elapsedTime){

@@ -24,20 +24,22 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
     ]
 
     //Starting paddle width and height in brick units.
+    // reflectance is how much the trajectory of the ball is changed after hitting 
+    // the end of the paddle in some arbitrary unit.
     let paddle = {
         fillStyle: 'rgba(0, 255, 0, 1)',
         strokeStyle: 'rgba(0, 150, 0, 1)',
         width: 2,
         height: .5,
-        rate: 1750
+        rate: 1000,
+        reflectance: .9 
     }
 
     //Ball radius in width and height
     let ball = {
         fillStyle: 'rgba(255,255,255,1)',
         strokeStyle: 'rgba(255,255,255,1)',
-        xRate: 500,
-        yRate: -500,
+        rate: paddle.rate * 1.1,
         radius: .2
     }
 
