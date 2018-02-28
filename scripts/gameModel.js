@@ -52,11 +52,12 @@ MyGame.gameModel = function(paddle, ball, colorList){
             if (brickX1 < ballX2 && brickX2 > ballX1){
                 if (brickY1 < ballY2 && brickY2 > ballY1){
                     brickList.splice(i,1);
-                    if (brickX1 > ballX1 || brickX2 < ballX2){
-                        ball.xRate *= -1;
-                    }else{
-                        ball.yRate *= -1;
-                    }
+                    //Checking how to reflect the ball after hitting a brick
+                    // if (brickX1 > ballX1 || brickX2 < ballX2){
+                    //     ball.xRate *= -1;
+                    // }else{
+                    //     ball.yRate *= -1;
+                    // }
                 }
             }
         }
