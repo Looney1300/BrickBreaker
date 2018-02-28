@@ -48,9 +48,15 @@ MyGame.gameModel = function(paddle, ball, colorList){
             ballY1 = ball.centerY - ball.radius;
             ballX2 = ball.centerX + ball.radius;
             ballY2 = ball.centerY + ball.radius;
+
             if (brickX1 < ballX2 && brickX2 > ballX1){
-                if(brickY1 < ballY2 && brickY2 > ballY1){
+                if (brickY1 < ballY2 && brickY2 > ballY1){
                     brickList.splice(i,1);
+                    if (brickX1 > ballX1 || brickX2 < ballX2){
+                        ball.xRate *= -1;
+                    }else{
+                        ball.yRate *= -1;
+                    }
                 }
             }
         }
