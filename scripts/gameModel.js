@@ -17,7 +17,6 @@ MyGame.gameModel = function(paddle, ball, colorList){
     ball.yRate = -1 * ball.rate * Math.sin(Math.PI/4);
     let Xrate = ball.xRate;
     let Yrate = ball.yRate;
-
     
     //Game graphics members
     let brickLevel = graphics.BrickLevel(level);
@@ -43,6 +42,20 @@ MyGame.gameModel = function(paddle, ball, colorList){
         ballGraphic.draw();
     }
 
+    let countDownUpdate = function(elapsedTime){
+    }
+    
+    let menuUpdate = function(elapsedTime){
+    }
+    
+    let gameModelUpdate = function(elapsedTime){
+        updateBall(elapsedTime);
+        updateCollisions();
+    }
+
+    //Starting update function set.
+    let update = gameModelUpdate;
+
     function detectCollisionWithBrick(){
         let brickList = level.brickList;
         for (let i = (brickList.length-1); i >= 0; --i){
@@ -60,11 +73,11 @@ MyGame.gameModel = function(paddle, ball, colorList){
                     console.log('detected brick collision');
                     brickList.splice(i,1);
                     //Checking how to reflect the ball after hitting a brick
-                    // if (brickX1 > ballX1 || brickX2 < ballX2){
-                    //     ball.xRate *= -1;
-                    // }else{
-                    //     ball.yRate *= -1;
-                    // }
+                    if (brickX1 > ballX1 || brickX2 < ballX2){
+                        ball.xRate *= -1;
+                    }else{
+                        ball.yRate *= -1;
+                    }
                 }
             }
         }
@@ -97,8 +110,10 @@ MyGame.gameModel = function(paddle, ball, colorList){
         if (ball.centerY - ball.radius <= 0){
             ball.yRate *= -1;
         }
-        if (ball.centerY + ball.radius >= CANVASHEIGHT){
-            ball.yRate *= -1;
+        if (ball.centerY + ball.radius >= CANVASHEIGHT + brickUnit){
+            //Uncomment to create a floor.
+            //ball.yRate *= -1;
+            update = menuUpdate;
             return false;
         }
         return true;
@@ -126,6 +141,7 @@ MyGame.gameModel = function(paddle, ball, colorList){
         return object.x > 0;
     }
 
+
     that.movePaddleRight = function(elapsedTime){
         if (isInRightBound(paddle)){
             paddle.x += elapsedTime/1000 * paddle.rate;
@@ -139,8 +155,7 @@ MyGame.gameModel = function(paddle, ball, colorList){
     }
 
     that.updateGameModel = function(elapsedTime){
-        updateBall(elapsedTime);
-        updateCollisions();
+        update(elapsedTime);
     }
 
     return that;

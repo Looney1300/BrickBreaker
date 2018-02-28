@@ -93,25 +93,14 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
     //
     //-----------------------------------------------------
 
-    function processInput(elapsedTime){
-        keyboard.processInput(elapsedTime);
-    }
-
-    let countDownUpdate = function(elapsedTime){
-    }
-    
-    let menuUpdate = function(elapsedTime){
-    }
-    
-    function gameModelUpdate(elapsedTime){
+    function update(elapsedTime){
         updateFPS(elapsedTime);
         gameModel.updateGameModel(elapsedTime);        
     }
-    
-    //TODO: this should start at menuUpdate, but for easy 
-    //development, I will initialize it with gameUpdate.
-    // let update = menuUpdate;
-    let update = gameModelUpdate;
+
+    function processInput(elapsedTime){
+        keyboard.processInput(elapsedTime);
+    }
 
     function render(elapsedTime){
         //Draw the game (clearing the screen is handled by the drawGame function)
