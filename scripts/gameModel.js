@@ -1,5 +1,11 @@
-MyGame.gameModel = function(paddle, ball, colorList){
+MyGame.gameModel = function(gameSpecs){
     let that = {};
+    //Unpacking gameSpecs
+    let paddle = gameSpecs.paddle;
+    let ball = gameSpecs.ball;
+    let colorList = gameSpecs.colorList;
+    let background = gameSpecs.background;
+
     let CANVASWIDTH = 1600;
     let CANVASHEIGHT = 1000;
     let graphics = MyGame.graphics;
@@ -9,8 +15,6 @@ MyGame.gameModel = function(paddle, ball, colorList){
     let brickUnit = CANVASWIDTH/gameWidthInBricks;
     let gapAbove = 6/5*brickUnit;
     paddle.gapBelowPaddle = brickUnit * (2/5 + paddle.height);
-    let gameTime = 0;
-    let levelCount = 1;
     let level = breakerMaker.generateLevel(gameWidthInBricks, gameHeightInBricks, colorList);
     level.gapAbove = gapAbove;
     ball.xRate = ball.rate * Math.cos(Math.PI/4);
@@ -18,10 +22,35 @@ MyGame.gameModel = function(paddle, ball, colorList){
     let Xrate = ball.xRate;
     let Yrate = ball.yRate;
     
+    let gameTime = 0;
+    let lives = 3;
+    let levelCount = 1;
+
+    //Menu Screen
+        //button list for menu screen: same components as a rectangle.
+    let newGameButton = {
+        x: 0,
+        y: 0,
+        rotation: 0,
+        width: 3/5 * CANVASWIDTH,
+        height: CANVASHEIGHT/5,
+        fillStyle: colorList[0].fillStyle,
+        strokeStyle: colorList[0].strokeStyle
+    };
+
+    let buttonList = [newGameButton];
+
+    let menu = {
+        background: background,
+        buttonList: buttonList,
+        gapBetweenButtons: CANVASHEIGHT/10
+    };
+    
     //Game graphics members
+    let menuGraphic = graphics.Menu(menu);
     let brickLevel = graphics.BrickLevel(level);
-    let paddleGraphic = graphics.Paddle(gameWidthInBricks, gameHeightInBricks, paddle);
-    let ballGraphic = graphics.Ball(gameWidthInBricks, ball);
+    let paddleGraphic = graphics.Paddle(paddle);
+    let ballGraphic = graphics.Ball(ball);
     //TODO: 
     //let levelTracker = graphics.Text(levelCount);
     //let gameTimeDisplay = graphics.Text(gameTime);
@@ -35,17 +64,30 @@ MyGame.gameModel = function(paddle, ball, colorList){
         }
     }
 
-    that.drawGame = function(){
+    let drawGame = function(){
         graphics.clear();
         brickLevel.draw();
         paddleGraphic.draw();
         ballGraphic.draw();
     }
 
+    let drawMenu = function(){
+        graphics.clear();
+        menuGraphic.draw();        
+    }
+
+    let drawCountDown = function(){
+
+    }
+
+    that.drawGame = drawGame;
+
     let countDownUpdate = function(elapsedTime){
+
     }
     
     let menuUpdate = function(elapsedTime){
+
     }
     
     let gameModelUpdate = function(elapsedTime){
@@ -54,7 +96,7 @@ MyGame.gameModel = function(paddle, ball, colorList){
     }
 
     //Starting update function set.
-    let update = gameModelUpdate;
+    that.updateGame = gameModelUpdate;
 
     function detectCollisionWithBrick(){
         let brickList = level.brickList;
@@ -110,13 +152,16 @@ MyGame.gameModel = function(paddle, ball, colorList){
         if (ball.centerY - ball.radius <= 0){
             ball.yRate *= -1;
         }
-        if (ball.centerY + ball.radius >= CANVASHEIGHT + brickUnit){
+        if (ball.centerY + ball.radius >= CANVASHEIGHT + 8*brickUnit){
             //Uncomment to create a floor.
             //ball.yRate *= -1;
-            update = menuUpdate;
             return false;
         }
         return true;
+    }
+
+    function restartGame(){
+        ballGraphic = graphics.Ball()
     }
 
     function updateCollisions(){
@@ -125,7 +170,13 @@ MyGame.gameModel = function(paddle, ball, colorList){
         }else if (ball.centerY > CANVASWIDTH - paddle.gapBelowPaddle - paddle.width*brickUnit){
             detectCollisionWithPaddle();
         }
-        detectCollisionWithWall();
+        if (!detectCollisionWithWall()){
+            --lives;
+            if (lives <= 0){
+                that.updateGame = menuUpdate;
+                that.drawGame = drawMenu;
+            }
+        }
     }
     
     function updateBall(elapsedTime){
@@ -152,10 +203,6 @@ MyGame.gameModel = function(paddle, ball, colorList){
         if (isInLeftBound(paddle)){
             paddle.x -= elapsedTime/1000 * paddle.rate;
         }
-    }
-
-    that.updateGameModel = function(elapsedTime){
-        update(elapsedTime);
     }
 
     return that;

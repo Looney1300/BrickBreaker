@@ -34,7 +34,7 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
         rate: 1000,
         reflectance: .9 
     }
-
+    
     //Ball radius in width and height
     let ball = {
         fillStyle: 'rgba(255,255,255,1)',
@@ -43,8 +43,22 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
         radius: .2
     }
 
+    //background image for menu screen: same components as a texture.
+    let background = {
+        center: {x: 0, y: 0},
+        rotation: 0,
+        imageSrc: 'images/background1.jpg'
+    }
+
+    let gameSpecs = {
+        paddle: paddle,
+        ball: ball,
+        background: background,
+        colorList: colorList
+    }
+
     //generate the default gameModel
-    let gameModel = MyGame.gameModel(paddle, ball, colorList);
+    let gameModel = MyGame.gameModel(gameSpecs);
 
 
     //----------------------------------------------
@@ -95,7 +109,7 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
 
     function update(elapsedTime){
         updateFPS(elapsedTime);
-        gameModel.updateGameModel(elapsedTime);        
+        gameModel.updateGame(elapsedTime);        
     }
 
     function processInput(elapsedTime){

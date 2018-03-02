@@ -8,6 +8,7 @@ MyGame.graphics = (function(){
 
     let canvas = document.getElementById('canvas-main');
     let context = canvas.getContext('2d');
+    let brickUnit = 0;
 
     function clear(){
         context.save();
@@ -170,10 +171,10 @@ MyGame.graphics = (function(){
     */
     function BrickLevel(level){
         let that = {};
+        brickUnit = canvas.width/level.width;
         //Build rectange spec List
         function buildRectangleList(newBrickBox){
             let rectangleList = [];
-            let brickUnit = canvas.width/newBrickBox.width;
             let gapAboveBricks = newBrickBox.gapAbove;
             for (let i = 0; i < newBrickBox.brickList.length; ++i){
                     //Give the necessary components to the Rectangle function.
@@ -200,8 +201,7 @@ MyGame.graphics = (function(){
     /*
     Paddle draws a rectangle in the bottom center of the game.
     */
-    function Paddle(width, height, paddle){
-        let brickUnit = canvas.width/width;
+    function Paddle(paddle){
         paddle.rotation = 0;
         paddle.x = canvas.width/2 - (brickUnit * paddle.width)/2;
         paddle.y = canvas.height - paddle.gapBelowPaddle;
@@ -213,8 +213,7 @@ MyGame.graphics = (function(){
     /*
     Ball creates a rectangle as a ball.
     */
-    function Ball(width, ball){
-        let brickUnit = canvas.width/width;
+    function Ball(ball){
         ball.rotation = 0;
         //Starting x,y
         ball.centerX = canvas.width/2;
@@ -223,6 +222,32 @@ MyGame.graphics = (function(){
         ball.height = ball.radius * 2 * brickUnit;
         ball.radius = ball.radius * brickUnit;
         return Circle(ball);
+    }
+
+    /*
+    Menu creates a menu from a menu object with...
+     background - 
+     buttonList - list of rectangles 
+     gapBetweenButtons
+    */
+    function Menu(menu){
+        let that = {};
+        background.width = canvas.width;
+        background.height = canvas.height;
+        let t = Texture(background);
+        let bgList = [];
+        for (let i=0; i < menu.buttonList.length; ++i){
+            bgList.push(Rectangle(menu.buttonList[i]));
+        }
+
+        that.draw = function(){
+            t.draw();
+            for (let i=0; i<bgList.length; ++i){
+                bgList[i].draw();
+            }
+        };
+
+        return that;
     }
 
     function assetToTextureSpec(character, maze){
@@ -245,6 +270,7 @@ MyGame.graphics = (function(){
         BrickLevel: BrickLevel,
         Paddle: Paddle,
         Ball: Ball,
+        Menu: Menu,
         assetToTextureSpec: assetToTextureSpec
     };
 
