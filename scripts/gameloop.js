@@ -1,11 +1,5 @@
-//Load APIs 
-// let breakerMaker = MyGame.breakerMaker;
-// let graphics = MyGame.graphics;
-// let keyboard = MyGame.input.Keyboard();
-
 //On my MyGame object, I'm making a main property that is filled
-// with a function that is immediately invoked with the graphics api parameter
-// listed immediately after.
+// with a function that is immediately invoked.
 MyGame.main = (function(graphics, breakerMaker, keyboard){
     
     let previousTime = performance.now();
@@ -15,10 +9,12 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
     //-------------------------------------------
     //Generate default level
     let colorList = [
-        {fill: 'rgba(100, 100, 100, 1)', stroke: 'rgba(0, 0, 0, 1)'},
-        {fill: 'rgba(150, 150, 150, 1)', stroke: 'rgba(0, 0, 0, 1)'},
-        {fill: 'rgba(200, 200, 200, 1)', stroke: 'rgba(0, 0, 0, 1)'},
-        {fill: 'rgba(50, 50, 50, 1)', stroke: 'rgba(0, 0, 0, 1)'},
+        {fill: 'rgba(0, 0, 255, 1)', stroke: 'rgba(0, 0, 175, 1)'},
+        {fill: 'rgba(255, 0, 0, 1)', stroke: 'rgba(175, 0, 0, 1)'},
+        {fill: 'rgba(0, 255, 0, 1)', stroke: 'rgba(0, 175, 0, 1)'},
+        {fill: 'rgba(255, 120, 255, 1)', stroke: 'rgba(175, 100, 175, 1)'},
+        {fill: 'rgba(240, 230, 0, 1)', stroke: 'rgba(170, 165, 0, 1)'},        
+        {fill: 'rgba(150, 50, 255, 1)', stroke: 'rgba(100, 35, 150, 1)'},        
     ]
 
     //Starting paddle width and height in brick units.
@@ -28,7 +24,7 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
         fillStyle: 'rgba(0, 255, 0, 1)',
         strokeStyle: 'rgba(0, 150, 0, 1)',
         width: 2,
-        height: .5,
+        height: .4,
         rate: 1000,
         reflectance: .8 
     }
@@ -37,15 +33,13 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
     let ball = {
         fillStyle: 'rgba(255,255,255,1)',
         strokeStyle: 'rgba(255,255,255,1)',
-        rate: paddle.rate * 1.1,
-        radius: .2
+        rate: paddle.rate * 0.8,
+        radius: .25
     }
 
     //background image for menu screen: same components as a texture.
     let background = {
-        center: {x: 0, y: 0},
-        rotation: 0,
-        imageSrc: 'images/background1.jpg'
+        imageSrc: 'images/background1s.jpg'
     }
 
     let gameSpecs = {

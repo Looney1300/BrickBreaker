@@ -46,7 +46,7 @@ MyGame.graphics = (function(){
             context.fillStyle = spec.fillStyle;
             context.fillRect(spec.x, spec.y, spec.width, spec.height);
             context.strokeStyle = spec.strokeStyle;
-            context.lineWidth = 2;
+            context.lineWidth = 5;
             context.strokeRect(spec.x, spec.y, spec.width, spec.height);
             //4. Undo translations and rotations of canvas.
             context.restore();
@@ -171,6 +171,7 @@ MyGame.graphics = (function(){
     */
     function BrickLevel(level){
         let that = {};
+        let gapBetweenBricks = 10;
         brickUnit = canvas.width/level.width;
         //Build rectange spec List
         function buildRectangleList(newBrickBox){
@@ -179,10 +180,10 @@ MyGame.graphics = (function(){
             for (let i = 0; i < newBrickBox.brickList.length; ++i){
                     //Give the necessary components to the Rectangle function.
                     rectangleList.push({
-                        x: newBrickBox.brickList[i].x * brickUnit,
+                        x: newBrickBox.brickList[i].x * brickUnit + 0.5*gapBetweenBricks,
                         y: newBrickBox.brickList[i].y * 2/5 * brickUnit + gapAboveBricks,
-                        width: brickUnit,
-                        height: 2/5 * brickUnit,
+                        width: brickUnit - gapBetweenBricks,
+                        height: 2/5 * brickUnit - gapBetweenBricks,
                         rotation: newBrickBox.brickList[i].rotation,
                         fillStyle: newBrickBox.brickList[i].fillStyle,
                         strokeStyle: newBrickBox.brickList[i].strokeStyle
@@ -235,7 +236,10 @@ MyGame.graphics = (function(){
         let that = {};
         background.width = canvas.width;
         background.height = canvas.height;
+        background.center = {x: canvas.width/2, y: canvas.height/2};
+        background.rotation = 0;
         let t = Texture(background);
+
         let bgList = [];
         menu.button.y = (canvas.height - (2*menu.gap + 3*menu.button.height))/2;
 

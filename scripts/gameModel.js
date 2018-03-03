@@ -11,9 +11,9 @@ MyGame.gameModel = function(gameSpecs){
     let graphics = MyGame.graphics;
     let breakerMaker = MyGame.breakerMaker;
     let gameWidthInBricks = 15;
-    let gameHeightInBricks = 5;
+    let gameHeightInBricks = 6;
     let brickUnit = CANVASWIDTH/gameWidthInBricks;
-    let gapAbove = 6/5*brickUnit;
+    let gapAbove = 8/5 * brickUnit;
     paddle.gapBelowPaddle = brickUnit * (2/5 + paddle.height);
     let level = breakerMaker.generateLevel(gameWidthInBricks, gameHeightInBricks, colorList);
     level.gapAbove = gapAbove;
@@ -46,6 +46,7 @@ MyGame.gameModel = function(gameSpecs){
     };
     
     //Game graphics members
+    //let back = graphics.Texture(background,)
     let menuGraphic = graphics.Menu(menu);
     let brickLevel = graphics.BrickLevel(level);
     let paddleGraphic = graphics.Paddle(paddle);
@@ -114,10 +115,10 @@ MyGame.gameModel = function(gameSpecs){
                     console.log('detected brick collision');
                     brickList.splice(i,1);
                     //Checking how to reflect the ball after hitting a brick
-                    if (brickX1 > ballX1 || brickX2 < ballX2){
-                        ball.xRate *= -1;
-                    }else{
+                    if (brickY1 > ballY1 || brickY2 < ballY2){
                         ball.yRate *= -1;
+                    }else{
+                        ball.xRate *= -1;
                     }
                 }
             }
