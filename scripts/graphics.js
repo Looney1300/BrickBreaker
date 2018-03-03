@@ -218,17 +218,18 @@ MyGame.graphics = (function(){
         //Starting x,y
         ball.centerX = canvas.width/2;
         ball.centerY = canvas.height - 3 * brickUnit;
-        ball.width = ball.radius * 2 * brickUnit;
-        ball.height = ball.radius * 2 * brickUnit;
-        ball.radius = ball.radius * brickUnit;
+        ball.width = ball.radius0 * 2 * brickUnit;
+        ball.height = ball.radius0 * 2 * brickUnit;
+        ball.radius = ball.radius0 * brickUnit;
         return Circle(ball);
     }
 
     /*
     Menu creates a menu from a menu object with...
-     background - 
-     buttonList - list of rectangles 
-     gapBetweenButtons
+     background
+     button
+     gap
+     rows
     */
     function Menu(menu){
         let that = {};
@@ -236,8 +237,19 @@ MyGame.graphics = (function(){
         background.height = canvas.height;
         let t = Texture(background);
         let bgList = [];
-        for (let i=0; i < menu.buttonList.length; ++i){
-            bgList.push(Rectangle(menu.buttonList[i]));
+        menu.button.y = (canvas.height - (2*menu.gap + 3*menu.button.height))/2;
+
+        for (let i=0; i < menu.rows; ++i){
+            bgList.push(Rectangle({
+                x: menu.button.x,
+                y: menu.button.y,
+                rotation: 0,
+                width: menu.button.width,
+                height: menu.button.height,
+                fillStyle: menu.button.fillStyle,
+                strokeStyle: menu.button.strokeStyle
+            }));
+            menu.button.y += menu.gap + menu.button.height;
         }
 
         that.draw = function(){

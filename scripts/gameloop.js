@@ -1,5 +1,3 @@
-
-
 //Load APIs 
 // let breakerMaker = MyGame.breakerMaker;
 // let graphics = MyGame.graphics;
@@ -32,7 +30,7 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
         width: 2,
         height: .5,
         rate: 1000,
-        reflectance: .9 
+        reflectance: .8 
     }
     
     //Ball radius in width and height

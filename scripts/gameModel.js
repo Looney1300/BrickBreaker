@@ -5,7 +5,7 @@ MyGame.gameModel = function(gameSpecs){
     let ball = gameSpecs.ball;
     let colorList = gameSpecs.colorList;
     let background = gameSpecs.background;
-
+    
     let CANVASWIDTH = 1600;
     let CANVASHEIGHT = 1000;
     let graphics = MyGame.graphics;
@@ -17,33 +17,32 @@ MyGame.gameModel = function(gameSpecs){
     paddle.gapBelowPaddle = brickUnit * (2/5 + paddle.height);
     let level = breakerMaker.generateLevel(gameWidthInBricks, gameHeightInBricks, colorList);
     level.gapAbove = gapAbove;
-    ball.xRate = ball.rate * Math.cos(Math.PI/4);
-    ball.yRate = -1 * ball.rate * Math.sin(Math.PI/4);
-    let Xrate = ball.xRate;
-    let Yrate = ball.yRate;
+    ball.radius0 = ball.radius;
+    let startAngle = 2*Math.PI/5;
+    ball.xRate = ball.rate * Math.cos(startAngle);
+    ball.yRate = -1 * ball.rate * Math.sin(startAngle);
+    ball.xRate0 = ball.xRate;
+    ball.yRate0 = ball.yRate;
     
     let gameTime = 0;
     let lives = 3;
     let levelCount = 1;
 
     //Menu Screen
-        //button list for menu screen: same components as a rectangle.
-    let newGameButton = {
-        x: 0,
-        y: 0,
-        rotation: 0,
+     //button list for menu screen: same components as a rectangle.
+    let menuButton = {
+        x: 1/5 * CANVASWIDTH,
         width: 3/5 * CANVASWIDTH,
-        height: CANVASHEIGHT/5,
-        fillStyle: colorList[0].fillStyle,
-        strokeStyle: colorList[0].strokeStyle
+        height: CANVASHEIGHT/8,
+        fillStyle: colorList[0].fill,
+        strokeStyle: colorList[0].stroke
     };
-
-    let buttonList = [newGameButton];
 
     let menu = {
         background: background,
-        buttonList: buttonList,
-        gapBetweenButtons: CANVASHEIGHT/10
+        button: menuButton,
+        rows: 3,
+        gap: CANVASHEIGHT/8
     };
     
     //Game graphics members
@@ -160,8 +159,10 @@ MyGame.gameModel = function(gameSpecs){
         return true;
     }
 
-    function restartGame(){
-        ballGraphic = graphics.Ball()
+    function restartBall(){
+        ball.xRate = ball.xRate0;
+        ball.yRate = ball.yRate0;
+        ballGraphic = graphics.Ball(ball);
     }
 
     function updateCollisions(){
@@ -176,6 +177,8 @@ MyGame.gameModel = function(gameSpecs){
                 that.updateGame = menuUpdate;
                 that.drawGame = drawMenu;
             }
+            console.log('restarting game');
+            restartBall();
         }
     }
     
