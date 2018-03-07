@@ -148,10 +148,13 @@ MyGame.gameModel = function(gameSpecs){
     }
 
     function detectCollisionWithWall(){
-        if (ball.centerX - ball.radius <= 0 || ball.centerX + ball.radius >= CANVASWIDTH){
+        if (ball.centerX - ball.radius <= 0 && ball.xRate < 0){
             ball.xRate *= -1;
         }
-        if (ball.centerY - ball.radius <= 0){
+        else if (ball.centerX + ball.radius >= CANVASWIDTH && ball.xRate > 0){
+            ball.xRate *= -1;
+        }
+        if (ball.centerY - ball.radius <= 0 && ball.yRate < 0){
             ball.yRate *= -1;
         }
         if (ball.centerY + ball.radius >= CANVASHEIGHT + 8*brickUnit){
@@ -218,10 +221,8 @@ MyGame.gameModel = function(gameSpecs){
                 console.log('button 1');
             }else if (buttonId === 2){
                 console.log('button 2');
-
             }else if (buttonId === 3){
                 console.log('button 3');
-
             }
         }
     }
