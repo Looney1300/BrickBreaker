@@ -2,7 +2,31 @@ MyGame.input = (function() {
 
 	//TODO: make a mouse input handling api.
 	function Mouse() {
+		let that = {
+			pressed: function(){},
+			released: function(){},
+		};
 		
+		function mousePress(e){
+			that.pressed();
+		}
+		
+		function mouseRelease(e){
+			that.released(e);
+		}
+
+		that.registerMousePressedHandler = function(handler){
+			that.pressed = handler;
+		}
+
+		that.registerMouseReleasedHandler = function(handler){
+			that.released = handler;
+		}
+
+		document.getElementById('canvas-main').addEventListener('mouseup', mouseRelease);
+		document.getElementById('canvas-main').addEventListener('mousedown', mousePress);
+	
+		return that;
 	}
 
 	function Keyboard() {
@@ -13,7 +37,7 @@ MyGame.input = (function() {
 			handlers: {}
 		};
 
-		that.registerKey= function(key, handler) {
+		that.registerKey = function(key, handler) {
 			that.handlers[key] = handler;
 		};
 
@@ -42,7 +66,8 @@ MyGame.input = (function() {
 	}
 
 	return {
-		Keyboard: Keyboard
+		Keyboard: Keyboard,
+		Mouse: Mouse
 	};
 })();
 

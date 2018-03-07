@@ -5,6 +5,7 @@ MyGame.gameModel = function(gameSpecs){
     let ball = gameSpecs.ball;
     let colorList = gameSpecs.colorList;
     let background = gameSpecs.background;
+    let menuBackground = gameSpecs.menuBackground;
     
     let CANVASWIDTH = 1600;
     let CANVASHEIGHT = 1000;
@@ -39,14 +40,14 @@ MyGame.gameModel = function(gameSpecs){
     };
 
     let menu = {
-        background: background,
+        background: menuBackground,
         button: menuButton,
         rows: 3,
         gap: CANVASHEIGHT/8
     };
     
     //Game graphics members
-    let back = graphics.Background(background.imageSrc)
+    let back = graphics.Background(background)
     let menuGraphic = graphics.Menu(menu);
     let brickLevel = graphics.BrickLevel(level);
     let paddleGraphic = graphics.Paddle(paddle);
@@ -66,7 +67,6 @@ MyGame.gameModel = function(gameSpecs){
 
     let drawGame = function(){
         graphics.clear();
-        console.log(back);
         back.draw();
         brickLevel.draw();
         paddleGraphic.draw();
@@ -208,6 +208,21 @@ MyGame.gameModel = function(gameSpecs){
     that.movePaddleLeft = function(elapsedTime){
         if (isInLeftBound(paddle)){
             paddle.x -= elapsedTime/1000 * paddle.rate;
+        }
+    }
+
+    that.menuSelection = function(e){
+        if (lives === 0){
+            let buttonId = menuGraphic.isCoordinateOnButton({x: e.x, y: e.y});
+            if (buttonId === 1){
+                console.log('button 1');
+            }else if (buttonId === 2){
+                console.log('button 2');
+
+            }else if (buttonId === 3){
+                console.log('button 3');
+
+            }
         }
     }
 

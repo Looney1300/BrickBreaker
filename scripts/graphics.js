@@ -248,11 +248,7 @@ MyGame.graphics = (function(){
     */
     function Menu(menu){
         let that = {};
-        background.width = canvas.width;
-        background.height = canvas.height;
-        background.center = {x: canvas.width/2, y: canvas.height/2};
-        background.rotation = 0;
-        let t = Texture(background);
+        let b = Background(menu.background);
 
         let bgList = [];
         menu.button.y = (canvas.height - (2*menu.gap + 3*menu.button.height))/2;
@@ -271,24 +267,18 @@ MyGame.graphics = (function(){
         }
 
         that.draw = function(){
-            t.draw();
+            b.draw();
             for (let i=0; i<bgList.length; ++i){
                 bgList[i].draw();
             }
         };
 
-        return that;
-    }
+        //This returns nothing if not on a button, and returns 1,2, or 3 depending on which button on.
+        that.isCoordinateOnButton = function(coordinate){
+            return 1;
+        }
 
-    function assetToTextureSpec(character, maze){
-        let texture = {
-            imageSrc: character.src,
-            rotation: character.direction*3.14159/2,
-            center: mazeToCanvasCoordinates(maze, {x: character.location.x + 0.5, y: character.location.y + 0.5}),
-            width: mazeCellWidthUnitsToCanvasUnits(maze, 1),
-            height: mazeCellHeightUnitsToCanvasUnits(maze, 1)
-        };
-        return texture;
+        return that;
     }
     
     return {
@@ -302,7 +292,6 @@ MyGame.graphics = (function(){
         Ball: Ball,
         Menu: Menu,
         Background: Background,
-        assetToTextureSpec: assetToTextureSpec
     };
 
 }());

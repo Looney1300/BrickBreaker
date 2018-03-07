@@ -1,6 +1,6 @@
 //On my MyGame object, I'm making a main property that is filled
 // with a function that is immediately invoked.
-MyGame.main = (function(graphics, breakerMaker, keyboard){
+MyGame.main = (function(graphics, breakerMaker, keyboard, mouse){
     
     let previousTime = performance.now();
 
@@ -37,15 +37,15 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
         radius: .25
     }
 
-    //background image for menu screen: same components as a texture.
-    let background = {
-        imageSrc: 'images/background1s.jpg'
-    }
+    //background images for gameplay and menu
+    let background = 'images/space1.jpg';
+    let menuBackground = 'images/space2.jpg';
 
     let gameSpecs = {
         paddle: paddle,
         ball: ball,
         background: background,
+        menuBackground: menuBackground,
         colorList: colorList
     }
 
@@ -70,10 +70,11 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
 
     //---------------------------------------------------------------
 
-    //Default key registration to handlers
+    //Default key/mouse registration to handlers
     keyboard.registerKey(KeyEvent['DOM_VK_RIGHT'], gameModel.movePaddleRight);
     keyboard.registerKey(KeyEvent['DOM_VK_LEFT'], gameModel.movePaddleLeft);
 
+    mouse.registerMouseReleasedHandler(gameModel.menuSelection);
 
     //----------------------------------------------
     //      Web Page Rendering scripts
@@ -126,4 +127,4 @@ MyGame.main = (function(graphics, breakerMaker, keyboard){
     console.log('game initializing...');
     requestAnimationFrame(gameLoop);
 
-}(MyGame.graphics, MyGame.breakerMaker, MyGame.input.Keyboard()));
+}(MyGame.graphics, MyGame.breakerMaker, MyGame.input.Keyboard(), MyGame.input.Mouse()));
