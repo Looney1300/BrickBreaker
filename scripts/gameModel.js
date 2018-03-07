@@ -46,7 +46,7 @@ MyGame.gameModel = function(gameSpecs){
     };
     
     //Game graphics members
-    //let back = graphics.Texture(background,)
+    let back = graphics.Background(background.imageSrc)
     let menuGraphic = graphics.Menu(menu);
     let brickLevel = graphics.BrickLevel(level);
     let paddleGraphic = graphics.Paddle(paddle);
@@ -66,6 +66,8 @@ MyGame.gameModel = function(gameSpecs){
 
     let drawGame = function(){
         graphics.clear();
+        console.log(back);
+        back.draw();
         brickLevel.draw();
         paddleGraphic.draw();
         ballGraphic.draw();

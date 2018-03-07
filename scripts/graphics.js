@@ -14,7 +14,6 @@ MyGame.graphics = (function(){
         context.save();
         context.setTransform(1, 0, 0, 1, 0, 0);
         context.clearRect(0, 0, canvas.width, canvas.height);
-        //What does this do?
         context.restore();
     }
 
@@ -65,6 +64,7 @@ MyGame.graphics = (function(){
       spec.height
      Texture function 'has' the following properties
       .draw
+      .updateRotation
     */
     function Texture(spec){
         let that = {},
@@ -79,18 +79,18 @@ MyGame.graphics = (function(){
             spec.rotation += angle;
         };
 
-        that.draw = function(spec1){
+        that.draw = function(){
             if (ready){                
                 context.save();
-                context.translate(spec1.center.x, spec1.center.y);
-                context.rotate(spec1.rotation);
-                context.translate(-spec1.center.x, -spec1.center.y);
+                context.translate(spec.center.x, spec.center.y);
+                context.rotate(spec.rotation);
+                context.translate(-spec.center.x, -spec.center.y);
 
                 context.drawImage(
                     image,
-                    spec1.center.x - spec1.width/2,
-                    spec1.center.y -spec1.height/2,
-                    spec1.width, spec1.height);
+                    spec.center.x - spec.width/2,
+                    spec.center.y -spec.height/2,
+                    spec.width, spec.height);
 
                 context.restore();   
             }
@@ -98,6 +98,20 @@ MyGame.graphics = (function(){
 
         return that;
     }
+
+    /*
+    Background makes a texture that has width and height of the canvas.
+    */
+   function Background(src){
+        let bck = {
+            center: {x: canvas.width/2, y: canvas.height/2},
+            rotation: 0,
+            imageSrc: src,
+            width: canvas.width,
+            height: canvas.height,
+        };
+        return Texture(bck);
+   }
 
     /*
     Line function is passed a lineList object that has: 
@@ -287,6 +301,7 @@ MyGame.graphics = (function(){
         Paddle: Paddle,
         Ball: Ball,
         Menu: Menu,
+        Background: Background,
         assetToTextureSpec: assetToTextureSpec
     };
 
