@@ -26,8 +26,8 @@ MyGame.gameModel = function(gameSpecs){
     ball.yRate0 = ball.yRate;
     
     let gameTime = 0;
-    let lives = 3;
-    let levelCount = 1;
+    let lives = 0;
+    let levelCount = 0;
 
     //Menu Screen
      //button list for menu screen: same components as a rectangle.
@@ -82,7 +82,8 @@ MyGame.gameModel = function(gameSpecs){
 
     }
 
-    that.drawGame = drawGame;
+    //START - beginning draw
+    that.drawGame = drawMenu;
 
     let countDownUpdate = function(elapsedTime){
 
@@ -97,8 +98,8 @@ MyGame.gameModel = function(gameSpecs){
         updateCollisions();
     }
 
-    //Starting update function set.
-    that.updateGame = gameModelUpdate;
+    //START - beginning update
+    that.updateGame = menuUpdate;
 
     function detectCollisionWithBrick(){
         let brickList = level.brickList;
@@ -216,7 +217,20 @@ MyGame.gameModel = function(gameSpecs){
 
     that.menuSelection = function(e){
         if (lives === 0){
-            let buttonId = menuGraphic.isCoordinateOnButton({x: e.x, y: e.y});
+            let x = 0;
+            let y = 0;
+            //The following if/else statement from 
+            // https://stackoverflow.com/questions/55677/how-do-i-get-the-coordinates-of-a-mouse-click-on-a-canvas-element
+            if (e.x || e.y) { 
+                x = e.x;
+                y = e.y;
+            } else { 
+                x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft; 
+                y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop; 
+            } 
+            
+            let buttonId = menuGraphic.isCoordinateOnButton({x: x, y: y});
+            console.log('buttonId: ' + buttonId);
             if (buttonId === 1){
                 console.log('button 1');
             }else if (buttonId === 2){

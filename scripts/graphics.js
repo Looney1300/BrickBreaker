@@ -250,6 +250,7 @@ MyGame.graphics = (function(){
         let that = {};
         let b = Background(menu.background);
 
+        let buttonsXY = [];
         let bgList = [];
         menu.button.y = (canvas.height - (2*menu.gap + 3*menu.button.height))/2;
 
@@ -263,6 +264,7 @@ MyGame.graphics = (function(){
                 fillStyle: menu.button.fillStyle,
                 strokeStyle: menu.button.strokeStyle
             }));
+            buttonsXY.push({x: menu.button.x, y: menu.button.y});
             menu.button.y += menu.gap + menu.button.height;
         }
 
@@ -274,8 +276,20 @@ MyGame.graphics = (function(){
         };
 
         //This returns nothing if not on a button, and returns 1,2, or 3 depending on which button on.
-        that.isCoordinateOnButton = function(coordinate){
-            return 1;
+        that.isCoordinateOnButton = function(screenCoordinate){
+            screenCoordinate.x -= canvas.offsetLeft;
+            screenCoordinate.y -= canvas.offsetTop;            
+            let canvasCoordinate = {
+                x: screenCoordinate.x * canvas.width/canvas.scrollWidth, 
+                y: screenCoordinate.y * canvas.height/canvas.scrollHeight
+            };
+            if (canvasCoordinate.x > buttonsXY[0].x && canvasCoordinate.x < buttonsXY[0].x + menu.button.width ){
+                for (let i=0; i < buttonsXY.length; ++i){
+                    if (canvasCoordinate.y > buttonsXY[i].y && canvasCoordinate.y < buttonsXY[i].y + menu.button.height){
+                        return i + 1;
+                    }
+                }
+            }
         }
 
         return that;
