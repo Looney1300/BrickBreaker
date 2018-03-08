@@ -26,7 +26,7 @@ MyGame.gameModel = function(gameSpecs){
     ball.xRate0 = ball.xRate;
     ball.yRate0 = ball.yRate;
     
-    let gameTime = 0;
+    let score = 0;
     let lives = 0;
     let levelCount = 0;
 
@@ -53,14 +53,30 @@ MyGame.gameModel = function(gameSpecs){
         textList: textList,
     };
     
+    let levelTrack = {
+        text: 'Level '+levelCount, 
+        font: '3em New-Courier', 
+        fillStyle: 'rgba(220, 220, 220, .2)', 
+        fill: true, 
+        stroke: true, 
+        strokeStyle: 'rgba(255, 255, 255, 1)', 
+        align: 'left', 
+        baseline: 'bottom',
+        x: 40,
+        y: CANVASHEIGHT - 5
+    };
+
+    let livesObj = {
+        
+    };
+
     //Game graphics members
     let back = graphics.Background(background)
     let menuGraphic = graphics.Menu(menu);
     let brickLevel = graphics.BrickLevel(level);
     let paddleGraphic = graphics.Paddle(paddle);
     let ballGraphic = graphics.Ball(ball);
-    //TODO: 
-    //let levelTracker = graphics.Text(levelCount);
+    let levelTracker = graphics.Letters(levelTrack);
     //let gameTimeDisplay = graphics.Text(gameTime);
 
     //Building collision test groups by brick column
@@ -78,6 +94,7 @@ MyGame.gameModel = function(gameSpecs){
         brickLevel.draw();
         paddleGraphic.draw();
         ballGraphic.draw();
+        levelTracker.draw();
         //TODO
         //lives.draw
         //score.draw
