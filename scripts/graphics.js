@@ -242,6 +242,48 @@ MyGame.graphics = (function(){
     }
 
     /*
+    Letters requires a spec with...
+      text
+      font
+      fill
+      fillStyle
+      stroke
+      strokeStyle
+      x
+      y
+      align
+      baseline
+    */
+    function Letters(spec){
+        let that = {};
+
+        that.draw = function(){
+            context.font = spec.font;
+            context.lineWidth = 3;
+            if (spec.hasOwnProperty('align')){
+                context.textAlign = spec.align;
+            }
+            if (spec.hasOwnProperty('baseline')){
+                context.textBaseline = spec.baseline;
+            }
+            if (spec.hasOwnProperty('fillStyle')){
+                context.fillStyle = spec.fillStyle;
+            }
+            if (spec.hasOwnProperty('fill')){
+                context.fillText(spec.text, spec.x, spec.y);
+            }
+            if (spec.hasOwnProperty('strokeStyle')){
+                context.strokeStyle = spec.strokeStyle;
+            }
+            if (spec.hasOwnProperty('stroke')){
+                context.strokeText(spec.text, spec.x, spec.y);
+            }
+        }
+
+        return that;
+    }
+
+    /*
     Menu creates a menu from a menu object with...
      background
      button
@@ -254,6 +296,7 @@ MyGame.graphics = (function(){
 
         let buttonsXY = [];
         let bgList = [];
+        let textgList = [];
         menu.button.y = (canvas.height - (2*menu.gap + 3*menu.button.height))/2;
 
         for (let i=0; i < menu.rows; ++i){
@@ -267,6 +310,9 @@ MyGame.graphics = (function(){
                 strokeStyle: menu.button.strokeStyle
             }));
             buttonsXY.push({x: menu.button.x, y: menu.button.y});
+            menu.textList[i].x = canvas.width/2;
+            menu.textList[i].y = menu.button.y + menu.button.height/2;
+            textgList.push(Letters(menu.textList[i]));
             menu.button.y += menu.gap + menu.button.height;
         }
 
@@ -274,6 +320,7 @@ MyGame.graphics = (function(){
             b.draw();
             for (let i=0; i<bgList.length; ++i){
                 bgList[i].draw();
+                textgList[i].draw();
             }
         };
 
@@ -306,6 +353,7 @@ MyGame.graphics = (function(){
         BrickLevel: BrickLevel,
         Paddle: Paddle,
         Ball: Ball,
+        Letters: Letters,
         Menu: Menu,
         Background: Background,
     };

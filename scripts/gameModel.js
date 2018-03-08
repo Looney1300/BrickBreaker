@@ -35,16 +35,22 @@ MyGame.gameModel = function(gameSpecs){
     let menuButton = {
         x: 1/5 * CANVASWIDTH,
         width: 3/5 * CANVASWIDTH,
-        height: CANVASHEIGHT/8,
-        fillStyle: colorList[0].fill,
-        strokeStyle: colorList[0].stroke
+        height: CANVASHEIGHT/6,
+        fillStyle: 'rgba(0, 0, 255, .6)',
+        strokeStyle: 'rgba(0, 0, 175, .6)'
     };
+
+    let textList = [{text: '- N E W  G A M E -', font: '4.5em Courier', fillStyle: colorList[0].stroke, fill: true, stroke: true, strokeStyle: 'rgba(220,220,220,1)', align: 'center', baseline: 'middle'},
+    {text: '- H I G H  S C O R E S -', font: '3.6em Courier', fillStyle: colorList[0].stroke, fill: true, stroke: true, strokeStyle: 'rgba(220,220,220,1)', align: 'center', baseline: 'middle'},
+    {text: '- C R E D I T S -', font: '3.5em Courier', fillStyle: colorList[0].stroke, fill: true, stroke: true, strokeStyle: 'rgba(220,220,220,1)', align: 'center', baseline: 'middle'}
+    ];
 
     let menu = {
         background: menuBackground,
         button: menuButton,
         rows: 3,
-        gap: CANVASHEIGHT/8
+        gap: CANVASHEIGHT/8,
+        textList: textList,
     };
     
     //Game graphics members
