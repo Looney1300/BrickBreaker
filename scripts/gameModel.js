@@ -16,6 +16,7 @@ MyGame.gameModel = function(gameSpecs){
     let brickUnit = CANVASWIDTH/gameWidthInBricks;
     let gapAbove = 8/5 * brickUnit;
     paddle.gapBelowPaddle = brickUnit * (2/5 + paddle.height);
+    
     let level = breakerMaker.generateLevel(gameWidthInBricks, gameHeightInBricks, colorList);
     level.gapAbove = gapAbove;
     ball.radius0 = ball.radius;
@@ -71,11 +72,17 @@ MyGame.gameModel = function(gameSpecs){
         brickLevel.draw();
         paddleGraphic.draw();
         ballGraphic.draw();
+        //TODO
+        //lives.draw
+        //score.draw
+        //border.draw
     }
 
     let drawMenu = function(){
         graphics.clear();
-        menuGraphic.draw();        
+        menuGraphic.draw();  
+        //TODO
+        //newGameText.draw      
     }
 
     let drawCountDown = function(){
@@ -84,6 +91,7 @@ MyGame.gameModel = function(gameSpecs){
 
     //START - beginning draw
     that.drawGame = drawMenu;
+    // that.drawGame = drawGame;
 
     let countDownUpdate = function(elapsedTime){
 
@@ -97,10 +105,11 @@ MyGame.gameModel = function(gameSpecs){
         updateBall(elapsedTime);
         updateCollisions();
     }
-
+    
     //START - beginning update
     that.updateGame = menuUpdate;
-
+    // that.updateGame = gameModelUpdate;
+    
     function detectCollisionWithBrick(){
         let brickList = level.brickList;
         for (let i = (brickList.length-1); i >= 0; --i){
@@ -117,6 +126,7 @@ MyGame.gameModel = function(gameSpecs){
                 if (brickY1 < ballY2 && brickY2 > ballY1){
                     console.log('detected brick collision');
                     brickList.splice(i,1);
+                    level.rectangleList.splice(i,1);
                     //Checking how to reflect the ball after hitting a brick
                     if (brickY1 > ballY1 || brickY2 < ballY2){
                         ball.yRate *= -1;
@@ -172,6 +182,32 @@ MyGame.gameModel = function(gameSpecs){
         ballGraphic = graphics.Ball(ball);
     }
 
+    function restartPaddle(){
+        paddle.x = paddle.x0;
+    }
+
+    function newGame(){
+        //New Game
+        restartBall();
+        restartPaddle();
+        level = breakerMaker.generateLevel(gameWidthInBricks, gameHeightInBricks, colorList);
+        level.gapAbove = gapAbove;
+        brickLevel = graphics.BrickLevel(level);
+        lives = 3;
+        levelCount = 1;
+        that.drawGame = drawGame;
+        that.updateGame = gameModelUpdate;
+        console.log('New Game Starting');
+    }
+
+    function credits(){
+        console.log('Showing Credits');
+    }
+
+    function highScores(){
+        console.log('Showing High Scores');
+    }
+
     function updateCollisions(){
         if (ball.centerY < gapAbove + 2/5 * brickUnit * (gameHeightInBricks + 1) + ball.radius){
             detectCollisionWithBrick();
@@ -184,7 +220,6 @@ MyGame.gameModel = function(gameSpecs){
                 that.updateGame = menuUpdate;
                 that.drawGame = drawMenu;
             }
-            console.log('restarting game');
             restartBall();
         }
     }
@@ -228,15 +263,14 @@ MyGame.gameModel = function(gameSpecs){
                 x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft; 
                 y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop; 
             } 
-            
+
             let buttonId = menuGraphic.isCoordinateOnButton({x: x, y: y});
-            console.log('buttonId: ' + buttonId);
             if (buttonId === 1){
-                console.log('button 1');
+                newGame();
             }else if (buttonId === 2){
-                console.log('button 2');
+                highScores();
             }else if (buttonId === 3){
-                console.log('button 3');
+                credits();
             }
         }
     }

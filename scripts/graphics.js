@@ -206,9 +206,10 @@ MyGame.graphics = (function(){
             return rectangleList;
         }
 
+        level.rectangleList = buildRectangleList(level);        
+        
         that.draw = function(){
-            let rs = Rectangles(buildRectangleList(level));
-            rs.draw();
+            Rectangles(level.rectangleList).draw();
         };
         return that;
     }
@@ -220,6 +221,7 @@ MyGame.graphics = (function(){
         paddle.rotation = 0;
         paddle.x = canvas.width/2 - (brickUnit * paddle.width)/2;
         paddle.y = canvas.height - paddle.gapBelowPaddle;
+        paddle.x0 = paddle.x;
         paddle.width = brickUnit * paddle.width;
         paddle.height = 2/5 * brickUnit * paddle.height;
         return Rectangle(paddle);
@@ -232,7 +234,7 @@ MyGame.graphics = (function(){
         ball.rotation = 0;
         //Starting x,y
         ball.centerX = canvas.width/2;
-        ball.centerY = canvas.height - 3 * brickUnit;
+        ball.centerY = canvas.height - 1.25 * brickUnit;
         ball.width = ball.radius0 * 2 * brickUnit;
         ball.height = ball.radius0 * 2 * brickUnit;
         ball.radius = ball.radius0 * brickUnit;
