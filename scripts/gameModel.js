@@ -138,17 +138,18 @@ MyGame.gameModel = function(gameSpecs){
     let particleSpec = {
         x: CANVASWIDTH/2,
         y: CANVASHEIGHT/2,
-        lifetime: {mean: 1000, std: 100},
-        particlesPerMS: 1,
+        particlesPerMS: .1,
         fill: 'rgba(100,100,100,1)',
         stroke: 'rgba(0,0,0,0)',
         maxRotation: .25,
-        speed: {mean: .1, std: .01},
-        duration: 50
+        lifetime: {mean: 1000, std: 150},
+        speed: {mean: .1, std: .05},
+        size: {mean: 6, std: 2},
+        duration: 250,
     }
 
-    let particleEffect = particleSystem.ExplosionEffect(particleSpec);
-    let particleEffectGraphic = graphics.Particles(particleEffect.particles);
+    let particleEffects = [];
+    let particleEffectGraphics = [];
 
     //Game graphics members
     let menuGraphic = graphics.Menu(menu);
@@ -203,6 +204,10 @@ MyGame.gameModel = function(gameSpecs){
         gameScoreDisplay.draw();
         livesDisplay.draw();
         countDownGraphic.draw();
+        for (let i=0; i<particleEffectGraphics.length; ++i){
+            console.log(particleEffectGraphics[i]);
+            particleEffectGraphics[i].draw(particleEffects[i].particles);    
+        }
         //TODO
         //border.draw
     }
@@ -210,7 +215,6 @@ MyGame.gameModel = function(gameSpecs){
     let drawMenu = function(){
         graphics.clear();
         menuGraphic.draw();
-        particleEffectGraphic.draw(particleEffect.particles);    
     }
 
     let drawCredits = function(){
@@ -249,13 +253,15 @@ MyGame.gameModel = function(gameSpecs){
     }
     
     let menuUpdate = function(elapsedTime){
-        particleEffect.update(elapsedTime);
+
     }
     
     let gameModelUpdate = function(elapsedTime){
         updateBall(elapsedTime);
         updateCollisions();
-        
+        for (let i=0; i<particleEffects.length; ++i){
+            particleEffects[i].update(elapsedTime);    
+        }
     }
     
     //START - beginning update
@@ -278,6 +284,21 @@ MyGame.gameModel = function(gameSpecs){
                 if (brickY1 < ballY2 && brickY2 > ballY1){
                     console.log('detected brick collision');
                     score += brickList[i].points;
+                    //Explode brick
+                    particleEffects.push(particleSystem.ExplosionEffect({
+                        x: CANVASWIDTH/2,
+                        y: CANVASHEIGHT/2,
+                        particlesPerMS: .1,
+                        fill: 'rgba(100,100,100,1)',
+                        stroke: 'rgba(0,0,0,0)',
+                        maxRotation: .25,
+                        lifetime: {mean: 1000, std: 150},
+                        speed: {mean: .1, std: .05},
+                        size: {mean: 6, std: 2},
+                        duration: 250,
+                    }));
+                    particleEffectGraphics.push(graphics.Particles(particleEffects[particleEffects.length-1].particles));
+
                     brickList.splice(i,1);
                     level.rectangleList.splice(i,1);
                     didHitBrick = true;
@@ -384,8 +405,10 @@ MyGame.gameModel = function(gameSpecs){
 
     function updateCollisions(){
         if (ball.centerY < gapAbove + 2/5 * brickUnit * (gameHeightInBricks + 1) + ball.radius){
-            if (detectCollisionWithBrick() && level.brickList.length === 0){
-                nextLevel();
+            if (detectCollisionWithBrick()){ 
+                if (level.brickList.length === 0){
+                    nextLevel();
+                }
             }
         }else if (ball.centerY > CANVASWIDTH - paddle.gapBelowPaddle - paddle.width*brickUnit){
             detectCollisionWithPaddle();

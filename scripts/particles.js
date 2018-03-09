@@ -4,8 +4,10 @@ MyGame.particleSystem = (function(){
       x
       y
       particlesPerMS
-      lifetime.max
-      lifetime.min
+      lifetime.mean
+      lifetime.std
+      size.mean
+      size.std
       stroke/fill/imageSrc
       maxRotation
 
@@ -38,9 +40,9 @@ MyGame.particleSystem = (function(){
                     direction: Random.nextCircleVector(),
                     speed: Random.nextGaussian( 0.05, .025 ),	// pixels per millisecond
                     rotation: 0,
-                    lifetime: Random.nextGaussian(spec.lifetime.max, spec.lifetime.min),	// milliseconds
+                    lifetime: Random.nextGaussian(spec.lifetime.mean, spec.lifetime.std),	// milliseconds
                     alive: 0,
-                    size: Random.nextGaussian(5, 2),
+                    size: Random.nextGaussian(spec.size.mean, spec.size.std),
                 };
                 if (spec.hasOwnProperty('fill')){
                     p.fill = spec.fill;
@@ -65,13 +67,16 @@ MyGame.particleSystem = (function(){
       x
       y
       particlesPerMS
-      lifetime.max
-      lifetime.min
-      speed.max
-      speed.min
+      lifetime.mean
+      lifetime.std
+      speed.mean
+      speed.std
+      size.mean
+      size.std
       stroke/fill/imageSrc
       maxRotation
       duration
+      gravity
     To make a firework explosion just set speed standard deviation very close to 0.
     */
     function ExplosionEffect(spec){
@@ -84,6 +89,9 @@ MyGame.particleSystem = (function(){
             
             for (let particle = 0; particle < that.particles.length; particle++) {
                 that.particles[particle].alive += elapsedTime;
+                if (spec.hasOwnProperty('gravity')){
+                    that.particles[particle].direction.y += spec.gravity;
+                }
                 that.particles[particle].position.x += (elapsedTime * that.particles[particle].speed * that.particles[particle].direction.x);
                 that.particles[particle].position.y += (elapsedTime * that.particles[particle].speed * that.particles[particle].direction.y);
                 if (spec.hasOwnProperty('maxRotation')){
@@ -108,7 +116,7 @@ MyGame.particleSystem = (function(){
                         rotation: 0,
                         lifetime: Random.nextGaussian(spec.lifetime.mean, spec.lifetime.std),	// milliseconds
                         alive: 0,
-                        size: Random.nextGaussian(5, 2),
+                        size: Random.nextGaussian(spec.size.mean, spec.size.std),
                     };
                     if (spec.hasOwnProperty('fill')){
                         p.fill = spec.fill;
@@ -127,6 +135,24 @@ MyGame.particleSystem = (function(){
         }
 
         return that;
+    }
+
+    /*
+    AreaDisolveEffect takes a certain area and makes it dissolve with a certain gravity. Expects object with...
+      gravity
+      x
+      y
+      particlesPerMS
+      lifetime.max
+      lifetime.min
+      speed.max
+      speed.min
+      stroke/fill/imageSrc
+      maxRotation
+      duration
+    */
+    function AreaDissolveEffect(spec){
+
     }
 
     return {
