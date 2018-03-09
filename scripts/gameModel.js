@@ -95,6 +95,18 @@ MyGame.gameModel = function(gameSpecs){
         y: CANVASHEIGHT - 5
     }
 
+    let countDown = {
+        time: 0,
+        text: "0",
+        font: '10em New-Courier', 
+        fillStyle: 'rgba(220, 220, 220, .9)', 
+        fill: true, 
+        align: 'center', 
+        baseline: 'middle',
+        x: CANVASWIDTH/2,
+        y: CANVASHEIGHT/2
+    }
+
     let particleSpec = {
         x: CANVASWIDTH/2,
         y: CANVASHEIGHT/2,
@@ -119,6 +131,7 @@ MyGame.gameModel = function(gameSpecs){
     let levelTracker = graphics.Letters(levelTrack);
     let gameScoreDisplay = graphics.Letters(gameScore);
     let livesDisplay = graphics.Letters(livesObj);
+    let countDownGraphic = graphics.Letters(countDown);
 
     //Building collision test groups by brick column
     // let testGroups = [];
@@ -138,20 +151,15 @@ MyGame.gameModel = function(gameSpecs){
         levelTracker.draw();
         gameScoreDisplay.draw();
         livesDisplay.draw();
+        countDownGraphic.draw();
         //TODO
         //border.draw
     }
     
     let drawMenu = function(){
         graphics.clear();
-        menuGraphic.draw();  
-        particleEffectGraphic.draw(particleEffect.particles);
-        //TODO
-        //newGameText.draw      
-    }
-
-    let drawCountDown = function(){
-
+        menuGraphic.draw();
+        particleEffectGraphic.draw(particleEffect.particles);    
     }
 
     //START - beginning draw
@@ -159,7 +167,20 @@ MyGame.gameModel = function(gameSpecs){
     // that.drawGame = drawGame;
 
     let countDownUpdate = function(elapsedTime){
-
+        countDown.time += elapsedTime;
+        if (countDown.time < 1000){
+            countDown.text = '3';
+        }
+        else if (countDown.time < 2000){
+            countDown.text = '2';
+        }
+        else if (countDown.time < 3000){
+            countDown.text = '1';
+        }else{
+            countDown.text = '';
+            countDown.time = 0;
+            that.updateGame = gameModelUpdate;
+        }
     }
     
     let menuUpdate = function(elapsedTime){
@@ -273,7 +294,7 @@ MyGame.gameModel = function(gameSpecs){
         score = 0;
         gameScore.text = "Score: " + score;
         that.drawGame = drawGame;
-        that.updateGame = gameModelUpdate;
+        that.updateGame = countDownUpdate;
         console.log('New Game Starting');
     }
 
@@ -301,8 +322,9 @@ MyGame.gameModel = function(gameSpecs){
         level = breakerMaker.generateLevel(gameWidthInBricks, gameHeightInBricks, colorList);
         level.gapAbove = gapAbove;
         brickLevel = graphics.BrickLevel(level);
-        console.log('You won the level! Level ' + levelCount + ' coming right up...');
-    };
+        that.updateGame = countDownUpdate;
+        console.log('Level ' + levelCount );
+    }
 
     function updateCollisions(){
         if (ball.centerY < gapAbove + 2/5 * brickUnit * (gameHeightInBricks + 1) + ball.radius){
@@ -315,7 +337,7 @@ MyGame.gameModel = function(gameSpecs){
         if (!detectCollisionWithWall()){
             --lives;
             livesObj.text = "Lives: " + lives;
-            console.log(lives);
+            that.updateGame = countDownUpdate;            
             if (lives <= 0){
                 that.updateGame = menuUpdate;
                 that.drawGame = drawMenu;
