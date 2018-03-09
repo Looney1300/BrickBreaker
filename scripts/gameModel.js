@@ -33,8 +33,8 @@ MyGame.gameModel = function(gameSpecs){
     let lives = 0;
     let levelCount = 1;
 
-    let top5 = [];
-
+    let top5 = MyGame.persistence.retrieveHighScores();
+    
     //Menu Screen
      //button list for menu screen: same components as a rectangle.
     let menuButton = {
@@ -63,15 +63,19 @@ MyGame.gameModel = function(gameSpecs){
 
     let highScoreText = {
         text: '- High Scores -',
-        font: '4em Courier', 
-        fillStyle: colorList[2].fill, 
+        font: '7em Courier', 
         fill: true, 
+        fillStyle: colorList[2].stroke, 
+        stroke: true,
+        strokeStyle: colorList[2].fill, 
         align: 'center', 
         baseline: 'top',
         x: CANVASWIDTH/2,
         y: 30
     };
 
+    let top5Graphics = [];
+    
     let menu = {
         background: menuBackground,
         button: menuButton,
@@ -171,6 +175,24 @@ MyGame.gameModel = function(gameSpecs){
     //     }
     // }
 
+    let updateTop5Graphics = function(){
+        top5Graphics.length = 0;
+        for (let i=0; i<top5.length; ++i){
+            top5Graphics.push(graphics.Letters({
+                text: '' + (i + 1) + '. ' + top5[i],
+                font: '5em Courier', 
+                fill: true, 
+                fillStyle: colorList[2].fill, 
+                align: 'left', 
+                baseline: 'top',
+                x: CANVASWIDTH/2 - 180,
+                y: 200 + 150*i 
+            }));
+        }
+    }
+
+    updateTop5Graphics();
+
     let drawGame = function(){
         graphics.clear();
         back.draw();
@@ -201,6 +223,9 @@ MyGame.gameModel = function(gameSpecs){
         graphics.clear();
         menuBack.draw();
         highScores.draw();
+        for (let i=0; i<top5Graphics.length; ++i){
+            top5Graphics[i].draw();
+        }
     }
 
     //START - beginning draw
@@ -368,8 +393,17 @@ MyGame.gameModel = function(gameSpecs){
         if (!detectCollisionWithWall()){
             --lives;
             livesObj.text = "Lives: " + lives;
-            that.updateGame = countDownUpdate;            
+            that.updateGame = countDownUpdate;
             if (lives <= 0){
+                top5.push(score);
+                top5.sort(function(a,b){return b-a;})
+                top5.splice(5, 1);
+                for (let i=0; i<top5.length; ++i){
+                    MyGame.persistence.remove(i);
+                    MyGame.persistence.add(i, top5[i]);
+                }
+                top5 = MyGame.persistence.retrieveHighScores();
+                updateTop5Graphics();
                 that.updateGame = menuUpdate;
                 that.drawGame = drawMenu;
             }
