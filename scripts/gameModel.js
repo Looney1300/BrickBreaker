@@ -98,14 +98,16 @@ MyGame.gameModel = function(gameSpecs){
     let particleSpec = {
         x: CANVASWIDTH/2,
         y: CANVASHEIGHT/2,
-        lifetime: {max: 2000, min: 1000},
+        lifetime: {mean: 1000, std: 100},
         particlesPerMS: 1,
         fill: 'rgba(100,100,100,1)',
         stroke: 'rgba(0,0,0,0)',
-        maxRotation: .25
+        maxRotation: .25,
+        speed: {mean: .1, std: .01},
+        duration: 50
     }
 
-    let particleEffect = particleSystem.BurningEffect(particleSpec);
+    let particleEffect = particleSystem.ExplosionEffect(particleSpec);
     let particleEffectGraphic = graphics.Particles(particleEffect.particles);
 
     //Game graphics members
