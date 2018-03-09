@@ -284,6 +284,38 @@ MyGame.graphics = (function(){
     }
 
     /*
+    Particles draws a list of particles.
+    */
+    function Particles(particles1){
+        let that = {};
+        that.draw = function(particles){
+            for (let i=0; i < particles.length; ++i){
+                if (particles[i].alive > 100){
+                    context.save();
+                    context.translate(particles[i].position.x + particles[i].size / 2, particles[i].position.y + particles[i].size / 2);
+                    context.rotate(particles[i].rotation);
+                    context.translate(-(particles[i].position.x + particles[i].size / 2), -(particles[i].position.y + particles[i].size / 2));
+            
+                    if (particles[i].hasOwnProperty('fill')){
+                        context.fillStyle = particles[i].fill;
+                        context.fillRect(particles[i].position.x, particles[i].position.y, particles[i].size, particles[i].size);
+                    }
+                    if (particles[i].hasOwnProperty('stroke')){
+                        context.strokeStyle = particles[i].stroke;
+                        context.strokeRect(particles[i].position.x, particles[i].position.y, particles[i].size, particles[i].size);
+                    }
+                    if (particles[i].hasOwnProperty('imageSrc')){
+                        particles[i].center = paricles[i].position;
+                        Texture(particles[i]).draw();
+                    }
+                    context.restore();
+                }
+            }
+        }
+        return that;
+    }
+
+    /*
     Menu creates a menu from a menu object with...
      background
      button
@@ -354,6 +386,7 @@ MyGame.graphics = (function(){
         Paddle: Paddle,
         Ball: Ball,
         Letters: Letters,
+        Particles: Particles,
         Menu: Menu,
         Background: Background,
     };

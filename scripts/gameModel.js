@@ -11,8 +11,11 @@ MyGame.gameModel = function(gameSpecs){
     let CANVASHEIGHT = 1000;
     let graphics = MyGame.graphics;
     let breakerMaker = MyGame.breakerMaker;
-    let gameWidthInBricks = 15;
-    let gameHeightInBricks = 6;
+    let particleSystem = MyGame.particleSystem;
+    let gameWidthInBricks = 18;
+    let gameHeightInBricks = 8;
+    let gameWidthInBricks0 = gameWidthInBricks;
+    let gameHeightInBricks0 = gameHeightInBricks;
     let brickUnit = CANVASWIDTH/gameWidthInBricks;
     let gapAbove = 8/5 * brickUnit;
     paddle.gapBelowPaddle = brickUnit * (2/5 + paddle.height);
@@ -28,7 +31,7 @@ MyGame.gameModel = function(gameSpecs){
     
     let score = 0;
     let lives = 0;
-    let levelCount = 0;
+    let levelCount = 1;
 
     //Menu Screen
      //button list for menu screen: same components as a rectangle.
@@ -54,7 +57,7 @@ MyGame.gameModel = function(gameSpecs){
     };
     
     let levelTrack = {
-        text: 'Level '+levelCount, 
+        text: 'Level '+ levelCount, 
         font: '3em New-Courier', 
         fillStyle: 'rgba(220, 220, 220, .2)', 
         fill: true, 
@@ -62,13 +65,48 @@ MyGame.gameModel = function(gameSpecs){
         strokeStyle: 'rgba(255, 255, 255, 1)', 
         align: 'left', 
         baseline: 'bottom',
-        x: 40,
+        x: 30,
+        y: CANVASHEIGHT - 5
+    };
+
+    let gameScore = {
+        text: 'Score: '+ score, 
+        font: '3em New-Courier', 
+        fillStyle: 'rgba(220, 220, 220, .2)', 
+        fill: true, 
+        stroke: true, 
+        strokeStyle: 'rgba(255, 255, 255, 1)', 
+        align: 'right', 
+        baseline: 'bottom',
+        x: CANVASWIDTH - 30,
         y: CANVASHEIGHT - 5
     };
 
     let livesObj = {
-        
-    };
+        text: 'Lives: ' + lives,
+        font: '3em New-Courier', 
+        fillStyle: 'rgba(220, 220, 220, .9)', 
+        fill: true, 
+        stroke: true, 
+        strokeStyle: 'rgba(255, 255, 255, .9)', 
+        align: 'center', 
+        baseline: 'bottom',
+        x: CANVASWIDTH/2,
+        y: CANVASHEIGHT - 5
+    }
+
+    let particleSpec = {
+        x: CANVASWIDTH/2,
+        y: CANVASHEIGHT/2,
+        lifetime: {max: 2000, min: 1000},
+        particlesPerMS: 1,
+        fill: 'rgba(100,100,100,1)',
+        stroke: 'rgba(0,0,0,0)',
+        maxRotation: .25
+    }
+
+    let particleEffect = particleSystem.BurningEffect(particleSpec);
+    let particleEffectGraphic = graphics.Particles(particleEffect.particles);
 
     //Game graphics members
     let back = graphics.Background(background)
@@ -77,16 +115,17 @@ MyGame.gameModel = function(gameSpecs){
     let paddleGraphic = graphics.Paddle(paddle);
     let ballGraphic = graphics.Ball(ball);
     let levelTracker = graphics.Letters(levelTrack);
-    //let gameTimeDisplay = graphics.Text(gameTime);
+    let gameScoreDisplay = graphics.Letters(gameScore);
+    let livesDisplay = graphics.Letters(livesObj);
 
     //Building collision test groups by brick column
-    let testGroups = [];
-    for (let j=0; j < gameWidthInBricks; ++j){
-        let columnj = []
-        for (let i=0; i < gameHeightInBricks; ++i){
-            columnj.push(level[i]);
-        }
-    }
+    // let testGroups = [];
+    // for (let j=0; j < gameWidthInBricks; ++j){
+    //     let columnj = []
+    //     for (let i=0; i < gameHeightInBricks; ++i){
+    //         columnj.push(level[i]);
+    //     }
+    // }
 
     let drawGame = function(){
         graphics.clear();
@@ -95,15 +134,16 @@ MyGame.gameModel = function(gameSpecs){
         paddleGraphic.draw();
         ballGraphic.draw();
         levelTracker.draw();
+        gameScoreDisplay.draw();
+        livesDisplay.draw();
         //TODO
-        //lives.draw
-        //score.draw
         //border.draw
     }
-
+    
     let drawMenu = function(){
         graphics.clear();
         menuGraphic.draw();  
+        particleEffectGraphic.draw(particleEffect.particles);
         //TODO
         //newGameText.draw      
     }
@@ -121,12 +161,13 @@ MyGame.gameModel = function(gameSpecs){
     }
     
     let menuUpdate = function(elapsedTime){
-
+        particleEffect.update(elapsedTime);
     }
     
     let gameModelUpdate = function(elapsedTime){
         updateBall(elapsedTime);
         updateCollisions();
+        
     }
     
     //START - beginning update
@@ -134,6 +175,7 @@ MyGame.gameModel = function(gameSpecs){
     // that.updateGame = gameModelUpdate;
     
     function detectCollisionWithBrick(){
+        let didHitBrick = false;
         let brickList = level.brickList;
         for (let i = (brickList.length-1); i >= 0; --i){
             brickX1 = brickUnit * brickList[i].x;
@@ -148,8 +190,11 @@ MyGame.gameModel = function(gameSpecs){
             if (brickX1 < ballX2 && brickX2 > ballX1){
                 if (brickY1 < ballY2 && brickY2 > ballY1){
                     console.log('detected brick collision');
+                    score += brickList[i].points;
                     brickList.splice(i,1);
                     level.rectangleList.splice(i,1);
+                    didHitBrick = true;
+                    gameScore.text = 'Score: ' + score;
                     //Checking how to reflect the ball after hitting a brick
                     if (brickY1 > ballY1 || brickY2 < ballY2){
                         ball.yRate *= -1;
@@ -159,6 +204,7 @@ MyGame.gameModel = function(gameSpecs){
                 }
             }
         }
+        return didHitBrick;
     }
 
     function detectCollisionWithPaddle(){
@@ -207,17 +253,23 @@ MyGame.gameModel = function(gameSpecs){
 
     function restartPaddle(){
         paddle.x = paddle.x0;
+        paddle.width = 2;
+        paddle.height = .4;
+        paddleGraphic = graphics.Paddle(paddle);
     }
 
     function newGame(){
         //New Game
         restartBall();
         restartPaddle();
-        level = breakerMaker.generateLevel(gameWidthInBricks, gameHeightInBricks, colorList);
+        level = breakerMaker.generateLevel(gameWidthInBricks0, gameHeightInBricks0, colorList);
         level.gapAbove = gapAbove;
         brickLevel = graphics.BrickLevel(level);
         lives = 3;
+        livesObj.text = 'Lives: ' + lives;
         levelCount = 1;
+        score = 0;
+        gameScore.text = "Score: " + score;
         that.drawGame = drawGame;
         that.updateGame = gameModelUpdate;
         console.log('New Game Starting');
@@ -231,14 +283,37 @@ MyGame.gameModel = function(gameSpecs){
         console.log('Showing High Scores');
     }
 
+    function nextLevel(){
+        score += 37*lives;
+        gameScore.text = "Score: " + score;
+        lives = 3;
+        livesObj.text = "Lives: " + lives;
+        ++levelCount;
+        levelTrack.text = "Level " + levelCount;
+        score += 100;
+        restartBall();
+        restartPaddle();
+        gameWidthInBricks += 3;
+        gameHeightInBricks += 1;
+        brickUnit = CANVASWIDTH/gameWidthInBricks;
+        level = breakerMaker.generateLevel(gameWidthInBricks, gameHeightInBricks, colorList);
+        level.gapAbove = gapAbove;
+        brickLevel = graphics.BrickLevel(level);
+        console.log('You won the level! Level ' + levelCount + ' coming right up...');
+    };
+
     function updateCollisions(){
         if (ball.centerY < gapAbove + 2/5 * brickUnit * (gameHeightInBricks + 1) + ball.radius){
-            detectCollisionWithBrick();
+            if (detectCollisionWithBrick() && level.brickList.length === 0){
+                nextLevel();
+            }
         }else if (ball.centerY > CANVASWIDTH - paddle.gapBelowPaddle - paddle.width*brickUnit){
             detectCollisionWithPaddle();
         }
         if (!detectCollisionWithWall()){
             --lives;
+            livesObj.text = "Lives: " + lives;
+            console.log(lives);
             if (lives <= 0){
                 that.updateGame = menuUpdate;
                 that.drawGame = drawMenu;
