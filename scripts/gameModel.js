@@ -135,19 +135,6 @@ MyGame.gameModel = function(gameSpecs){
         y: CANVASHEIGHT/2
     }
 
-    let particleSpec = {
-        x: CANVASWIDTH/2,
-        y: CANVASHEIGHT/2,
-        particlesPerMS: .1,
-        fill: 'rgba(100,100,100,1)',
-        stroke: 'rgba(0,0,0,0)',
-        maxRotation: .25,
-        lifetime: {mean: 1000, std: 150},
-        speed: {mean: .1, std: .05},
-        size: {mean: 6, std: 2},
-        duration: 250,
-    }
-
     let particleEffects = [];
     let particleEffectGraphics = [];
 
@@ -205,7 +192,6 @@ MyGame.gameModel = function(gameSpecs){
         livesDisplay.draw();
         countDownGraphic.draw();
         for (let i=0; i<particleEffectGraphics.length; ++i){
-            console.log(particleEffectGraphics[i]);
             particleEffectGraphics[i].draw(particleEffects[i].particles);    
         }
         //TODO
@@ -260,7 +246,10 @@ MyGame.gameModel = function(gameSpecs){
         updateBall(elapsedTime);
         updateCollisions();
         for (let i=0; i<particleEffects.length; ++i){
-            particleEffects[i].update(elapsedTime);    
+            if (!particleEffects[i].update(elapsedTime)){
+                particleEffects.splice(i,1);
+                particleEffectGraphics.splice(i,1);
+            }
         }
     }
     
@@ -285,17 +274,19 @@ MyGame.gameModel = function(gameSpecs){
                     console.log('detected brick collision');
                     score += brickList[i].points;
                     //Explode brick
-                    particleEffects.push(particleSystem.ExplosionEffect({
-                        x: CANVASWIDTH/2,
-                        y: CANVASHEIGHT/2,
-                        particlesPerMS: .1,
-                        fill: 'rgba(100,100,100,1)',
+                    particleEffects.push(particleSystem.AreaDissolveEffect({
+                        x: (brickList[i].x + .1) * brickUnit,
+                        y: (brickList[i].y - .2) * 2/5 * brickUnit + gapAbove,
+                        xMax: (brickList[i].x + .5 + .3) * brickUnit,
+                        yMax: (brickList[i].y + .5 - .2) * 2/5 * brickUnit + gapAbove,
+                        numParticles: 100,
+                        fill: brickList[i].fillStyle,
                         stroke: 'rgba(0,0,0,0)',
-                        maxRotation: .25,
-                        lifetime: {mean: 1000, std: 150},
-                        speed: {mean: .1, std: .05},
-                        size: {mean: 6, std: 2},
-                        duration: 250,
+                        maxRotation: .1,
+                        lifetime: {mean: 700, std: 100},
+                        speed: {mean: .05, std: .01},
+                        size: {mean: 9, std: 3},
+                        gravity: 7
                     }));
                     particleEffectGraphics.push(graphics.Particles(particleEffects[particleEffects.length-1].particles));
 

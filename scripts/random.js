@@ -6,8 +6,8 @@ var Random = (function() {
 	}
 	
 	function nextRange(min, max) {
-		var range = max - min + 1;
-		return Math.floor((Math.random() * range) + min);
+		var range = max - min;
+		return (Math.random() * range) + min;
 	}
 	
 	function nextCircleVector() {
