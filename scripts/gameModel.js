@@ -33,6 +33,8 @@ MyGame.gameModel = function(gameSpecs){
     let lives = 0;
     let levelCount = 1;
 
+    let top5 = [];
+
     //Menu Screen
      //button list for menu screen: same components as a rectangle.
     let menuButton = {
@@ -47,6 +49,28 @@ MyGame.gameModel = function(gameSpecs){
     {text: '- H I G H  S C O R E S -', font: '3.6em Courier', fillStyle: colorList[0].stroke, fill: true, stroke: true, strokeStyle: 'rgba(220,220,220,1)', align: 'center', baseline: 'middle'},
     {text: '- C R E D I T S -', font: '3.5em Courier', fillStyle: colorList[0].stroke, fill: true, stroke: true, strokeStyle: 'rgba(220,220,220,1)', align: 'center', baseline: 'middle'}
     ];
+
+    let creditText = {
+        text: '- Created By Landon Henrie -',
+        font: '4em Courier', 
+        fillStyle: colorList[2].fill, 
+        fill: true, 
+        align: 'center', 
+        baseline: 'middle',
+        x: CANVASWIDTH/2,
+        y: CANVASHEIGHT/2
+    };
+
+    let highScoreText = {
+        text: '- High Scores -',
+        font: '4em Courier', 
+        fillStyle: colorList[2].fill, 
+        fill: true, 
+        align: 'center', 
+        baseline: 'top',
+        x: CANVASWIDTH/2,
+        y: 30
+    };
 
     let menu = {
         background: menuBackground,
@@ -97,9 +121,9 @@ MyGame.gameModel = function(gameSpecs){
 
     let countDown = {
         time: 0,
-        text: "0",
-        font: '10em New-Courier', 
-        fillStyle: 'rgba(220, 220, 220, .9)', 
+        text: '0',
+        font: '30em New-Courier', 
+        fillStyle: 'rgba(230, 230, 230, .8)', 
         fill: true, 
         align: 'center', 
         baseline: 'middle',
@@ -123,8 +147,13 @@ MyGame.gameModel = function(gameSpecs){
     let particleEffectGraphic = graphics.Particles(particleEffect.particles);
 
     //Game graphics members
-    let back = graphics.Background(background)
     let menuGraphic = graphics.Menu(menu);
+    //let highScores = graphics.HighScores(Top5);
+    let credits = graphics.Letters(creditText);
+    let highScores = graphics.Letters(highScoreText);
+    let menuBack = graphics.Background(menuBackground);
+
+    let back = graphics.Background(background);
     let brickLevel = graphics.BrickLevel(level);
     let paddleGraphic = graphics.Paddle(paddle);
     let ballGraphic = graphics.Ball(ball);
@@ -162,9 +191,20 @@ MyGame.gameModel = function(gameSpecs){
         particleEffectGraphic.draw(particleEffect.particles);    
     }
 
+    let drawCredits = function(){
+        graphics.clear();
+        menuBack.draw();
+        credits.draw();
+    }
+
+    let drawHighScores = function(){
+        graphics.clear();
+        menuBack.draw();
+        highScores.draw();
+    }
+
     //START - beginning draw
     that.drawGame = drawMenu;
-    // that.drawGame = drawGame;
 
     let countDownUpdate = function(elapsedTime){
         countDown.time += elapsedTime;
@@ -195,7 +235,6 @@ MyGame.gameModel = function(gameSpecs){
     
     //START - beginning update
     that.updateGame = menuUpdate;
-    // that.updateGame = gameModelUpdate;
     
     function detectCollisionWithBrick(){
         let didHitBrick = false;
@@ -298,14 +337,6 @@ MyGame.gameModel = function(gameSpecs){
         console.log('New Game Starting');
     }
 
-    function credits(){
-        console.log('Showing Credits');
-    }
-
-    function highScores(){
-        console.log('Showing High Scores');
-    }
-
     function nextLevel(){
         score += 37*lives;
         gameScore.text = "Score: " + score;
@@ -359,7 +390,6 @@ MyGame.gameModel = function(gameSpecs){
         return object.x > 0;
     }
 
-
     that.movePaddleRight = function(elapsedTime){
         if (isInRightBound(paddle)){
             paddle.x += elapsedTime/1000 * paddle.rate;
@@ -390,11 +420,23 @@ MyGame.gameModel = function(gameSpecs){
             if (buttonId === 1){
                 newGame();
             }else if (buttonId === 2){
-                highScores();
+                that.drawGame = drawHighScores;
+                lives = -1;
             }else if (buttonId === 3){
-                credits();
+                that.drawGame = drawCredits;
+                lives = -1;
             }
         }
+        else if (lives === -1){
+            that.drawGame = drawMenu;
+            lives = 0;
+        }
+    }
+
+    that.escape = function(){
+        lives = 0;
+        that.gameUpdate = menuUpdate;
+        that.drawGame = drawMenu;
     }
 
     return that;

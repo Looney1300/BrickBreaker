@@ -57,22 +57,10 @@ MyGame.main = (function(graphics, breakerMaker, keyboard, mouse){
     //                  Handlers
     //----------------------------------------------
 
-    function toggleKeyBindings(){
-        // keyboard.registerKey(KeyEvent['DOM_VK_UP'], moveCharacterUp);
-        // keyboard.registerKey(KeyEvent['DOM_VK_RIGHT'], moveCharacterRight);
-        // keyboard.registerKey(KeyEvent['DOM_VK_DOWN'], moveCharacterDown);
-        // keyboard.registerKey(KeyEvent['DOM_VK_LEFT'], moveCharacterLeft);
-        // keyboard.registerKey(KeyEvent['DOM_VK_C'], toggleCrumbMode);
-        // keyboard.registerKey(KeyEvent['DOM_VK_H'], toggleHintMode);
-        // keyboard.registerKey(KeyEvent['DOM_VK_S'], toggleSolutionMode);
-        // keyboard.registerKey(KeyEvent['DOM_VK_V'], toggleScoreVisibility);
-    }
-
-    //---------------------------------------------------------------
-
     //Default key/mouse registration to handlers
     keyboard.registerKey(KeyEvent['DOM_VK_RIGHT'], gameModel.movePaddleRight);
     keyboard.registerKey(KeyEvent['DOM_VK_LEFT'], gameModel.movePaddleLeft);
+    keyboard.registerKey(KeyEvent['DOM_VK_ESCAPE'], gameModel.escape);
 
     mouse.registerMouseReleasedHandler(gameModel.menuSelection);
 
