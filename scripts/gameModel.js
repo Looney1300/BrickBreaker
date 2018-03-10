@@ -2,6 +2,8 @@ MyGame.gameModel = function(gameSpecs){
     let that = {};
     //Unpacking gameSpecs
     let paddle = gameSpecs.paddle;
+    paddle.width0 = paddle.width;
+    paddle.height0 = paddle.height;
     let ball = gameSpecs.ball;
     let colorList = gameSpecs.colorList;
     let background = gameSpecs.background;
@@ -86,7 +88,7 @@ MyGame.gameModel = function(gameSpecs){
     
     let levelTrack = {
         text: 'Level '+ levelCount, 
-        font: '3em New-Courier', 
+        font: '2em New-Courier', 
         fillStyle: 'rgba(220, 220, 220, .2)', 
         fill: true, 
         stroke: true, 
@@ -99,7 +101,7 @@ MyGame.gameModel = function(gameSpecs){
 
     let gameScore = {
         text: 'Score: '+ score, 
-        font: '3em New-Courier', 
+        font: '2em New-Courier', 
         fillStyle: 'rgba(220, 220, 220, .2)', 
         fill: true, 
         stroke: true, 
@@ -112,7 +114,7 @@ MyGame.gameModel = function(gameSpecs){
 
     let livesObj = {
         text: 'Lives: ' + lives,
-        font: '3em New-Courier', 
+        font: '2em New-Courier', 
         fillStyle: 'rgba(220, 220, 220, .9)', 
         fill: true, 
         stroke: true, 
@@ -148,11 +150,12 @@ MyGame.gameModel = function(gameSpecs){
     let back = graphics.Background(background);
     let brickLevel = graphics.BrickLevel(level);
     let paddleGraphic = graphics.Paddle(paddle);
-    let ballGraphic = graphics.Ball(ball);
+    let ballGraphic = graphics.Ball(ball, paddle);
     let levelTracker = graphics.Letters(levelTrack);
     let gameScoreDisplay = graphics.Letters(gameScore);
     let livesDisplay = graphics.Letters(livesObj);
     let countDownGraphic = graphics.Letters(countDown);
+    let countDownMode = true;
 
     //Building collision test groups by brick column
     // let testGroups = [];
@@ -190,10 +193,10 @@ MyGame.gameModel = function(gameSpecs){
         levelTracker.draw();
         gameScoreDisplay.draw();
         livesDisplay.draw();
-        countDownGraphic.draw();
         for (let i=0; i<particleEffectGraphics.length; ++i){
             particleEffectGraphics[i].draw(particleEffects[i].particles);    
         }
+        countDownGraphic.draw();
         //TODO
         //border.draw
     }
@@ -235,6 +238,7 @@ MyGame.gameModel = function(gameSpecs){
             countDown.text = '';
             countDown.time = 0;
             that.updateGame = gameModelUpdate;
+            countDownMode = false;
         }
     }
     
@@ -279,14 +283,16 @@ MyGame.gameModel = function(gameSpecs){
                         y: (brickList[i].y - .2) * 2/5 * brickUnit + gapAbove,
                         xMax: (brickList[i].x + .5 + .3) * brickUnit,
                         yMax: (brickList[i].y + .5 - .2) * 2/5 * brickUnit + gapAbove,
-                        numParticles: 100,
+                        numParticles: 80,
+                        particlesPerMS: .1,
                         fill: brickList[i].fillStyle,
                         stroke: 'rgba(0,0,0,0)',
                         maxRotation: .1,
                         lifetime: {mean: 700, std: 100},
                         speed: {mean: .05, std: .01},
                         size: {mean: 9, std: 3},
-                        gravity: 7
+                        gravity: 7,
+                        duration: 100,
                     }));
                     particleEffectGraphics.push(graphics.Particles(particleEffects[particleEffects.length-1].particles));
 
@@ -347,20 +353,20 @@ MyGame.gameModel = function(gameSpecs){
     function restartBall(){
         ball.xRate = ball.xRate0;
         ball.yRate = ball.yRate0;
-        ballGraphic = graphics.Ball(ball);
+        ballGraphic = graphics.Ball(ball, paddle);
+        ball.centerX = paddle.x + paddle.width/2;
     }
 
     function restartPaddle(){
         paddle.x = paddle.x0;
-        paddle.width = 2;
-        paddle.height = .4;
+        paddle.width = paddle.width0;
+        paddle.height = paddle.height0;
         paddleGraphic = graphics.Paddle(paddle);
     }
 
     function newGame(){
-        //New Game
-        restartBall();
         restartPaddle();
+        restartBall(ball, paddle);
         level = breakerMaker.generateLevel(gameWidthInBricks0, gameHeightInBricks0, colorList);
         level.gapAbove = gapAbove;
         brickLevel = graphics.BrickLevel(level);
@@ -371,10 +377,14 @@ MyGame.gameModel = function(gameSpecs){
         gameScore.text = "Score: " + score;
         that.drawGame = drawGame;
         that.updateGame = countDownUpdate;
+        countDownMode = true;
         console.log('New Game Starting');
     }
 
     function nextLevel(){
+        particleEffectGraphics.length = 0;
+        particleEffects.length = 0;
+        ball.x = 1.5*CANVASWIDTH
         score += 37*lives;
         gameScore.text = "Score: " + score;
         lives = 3;
@@ -382,8 +392,8 @@ MyGame.gameModel = function(gameSpecs){
         ++levelCount;
         levelTrack.text = "Level " + levelCount;
         score += 100;
-        restartBall();
         restartPaddle();
+        restartBall(ball, paddle);
         gameWidthInBricks += 3;
         gameHeightInBricks += 1;
         brickUnit = CANVASWIDTH/gameWidthInBricks;
@@ -391,6 +401,7 @@ MyGame.gameModel = function(gameSpecs){
         level.gapAbove = gapAbove;
         brickLevel = graphics.BrickLevel(level);
         that.updateGame = countDownUpdate;
+        countDownMode = true;
         console.log('Level ' + levelCount );
     }
 
@@ -407,7 +418,9 @@ MyGame.gameModel = function(gameSpecs){
         if (!detectCollisionWithWall()){
             --lives;
             livesObj.text = "Lives: " + lives;
+            restartBall(ball, paddle);
             that.updateGame = countDownUpdate;
+            countDownMode = true;
             if (lives <= 0){
                 top5.push(score);
                 top5.sort(function(a,b){return b-a;})
@@ -421,7 +434,6 @@ MyGame.gameModel = function(gameSpecs){
                 that.updateGame = menuUpdate;
                 that.drawGame = drawMenu;
             }
-            restartBall();
         }
     }
     
@@ -441,12 +453,18 @@ MyGame.gameModel = function(gameSpecs){
     that.movePaddleRight = function(elapsedTime){
         if (isInRightBound(paddle)){
             paddle.x += elapsedTime/1000 * paddle.rate;
+            if (countDownMode){
+                ball.centerX += elapsedTime/1000 * paddle.rate;
+            }
         }
     }
     
     that.movePaddleLeft = function(elapsedTime){
         if (isInLeftBound(paddle)){
             paddle.x -= elapsedTime/1000 * paddle.rate;
+            if (countDownMode){
+                ball.centerX -= elapsedTime/1000 * paddle.rate;
+            }
         }
     }
 

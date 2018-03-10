@@ -230,11 +230,11 @@ MyGame.graphics = (function(){
     /*
     Ball creates a rectangle as a ball.
     */
-    function Ball(ball){
+    function Ball(ball, paddle){
         ball.rotation = 0;
         //Starting x,y
         ball.centerX = canvas.width/2;
-        ball.centerY = canvas.height - 1.25 * brickUnit;
+        ball.centerY = paddle.y - ball.radius0 * brickUnit;
         ball.width = ball.radius0 * 2 * brickUnit;
         ball.height = ball.radius0 * 2 * brickUnit;
         ball.radius = ball.radius0 * brickUnit;
