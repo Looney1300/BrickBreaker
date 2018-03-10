@@ -18,6 +18,7 @@ MyGame.breakerMaker = (function(){
                 for (let y=0; y < heightInBricks; ++y){
                     //let r = Math.round((Math.random()*1000)) % colorList.length;
                     brickList.push({
+                        rowNum: y,
                         rotation: 0,
                         x: x,
                         y: y,

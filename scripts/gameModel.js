@@ -36,9 +36,11 @@ MyGame.gameModel = function(gameSpecs){
     let countDownMode = true;
     
     let score = 0;
-    let bricksRemoved = 0;
     let lives = 0;
     let levelCount = 1;
+    
+    let topRowHit = false;
+    let bricksRemoved = 0;
 
     let top5 = MyGame.persistence.retrieveHighScores();
     
@@ -341,6 +343,11 @@ MyGame.gameModel = function(gameSpecs){
                     }));
                     particleEffectGraphics.push(graphics.Particles(particleEffects[particleEffects.length-1].particles));
 
+                    if ((brickList[i].rowNum)%8 === 0 && !topRowHit){
+                        topRowHit = true;
+                        paddle.width /= 2;
+                    }
+
                     brickList.splice(i,1);
                     level.rectangleList.splice(i,1);
                     didHitBrick = true;
@@ -413,7 +420,9 @@ MyGame.gameModel = function(gameSpecs){
     }
 
     function restartBall(){
-        bricksRemoved = 0;                
+        paddle.width = paddle.width0 * brickUnit;
+        bricksRemoved = 0; 
+        topRowHit = false;               
         ballList[0].xRate = ballList[0].xRate0;
         ballList[0].yRate = ballList[0].yRate0;
         ballGraphicsList[0] = graphics.Ball(ballList[0], paddle);

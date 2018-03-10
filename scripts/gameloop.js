@@ -23,7 +23,7 @@ MyGame.main = (function(graphics, breakerMaker, keyboard, mouse){
     let paddle = {
         fillStyle: 'rgba(0, 255, 0, 1)',
         strokeStyle: 'rgba(0, 150, 0, 1)',
-        width: 2,
+        width: 3,
         height: .4,
         rate: 1000,
         reflectance: .8 
@@ -33,7 +33,7 @@ MyGame.main = (function(graphics, breakerMaker, keyboard, mouse){
     let ball = {
         fillStyle: 'rgba(255,255,255,1)',
         strokeStyle: 'rgba(255,255,255,1)',
-        rate: paddle.rate * 0.8,
+        rate: paddle.rate * 0.7,
         radius: .25
     }
 
