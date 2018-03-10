@@ -108,22 +108,11 @@ MyGame.gameModel = function(gameSpecs){
         strokeStyle: 'rgba(255, 255, 255, 1)', 
         align: 'right', 
         baseline: 'bottom',
-        x: CANVASWIDTH - 30,
+        x: 300,
         y: CANVASHEIGHT - 5
     };
 
-    let livesObj = {
-        text: 'Lives: ' + lives,
-        font: '2em New-Courier', 
-        fillStyle: 'rgba(220, 220, 220, .9)', 
-        fill: true, 
-        stroke: true, 
-        strokeStyle: 'rgba(255, 255, 255, .9)', 
-        align: 'center', 
-        baseline: 'bottom',
-        x: CANVASWIDTH/2,
-        y: CANVASHEIGHT - 5
-    }
+    let livesList = [];
 
     let countDown = {
         time: 0,
@@ -142,7 +131,6 @@ MyGame.gameModel = function(gameSpecs){
 
     //Game graphics members
     let menuGraphic = graphics.Menu(menu);
-    //let highScores = graphics.HighScores(Top5);
     let credits = graphics.Letters(creditText);
     let highScores = graphics.Letters(highScoreText);
     let menuBack = graphics.Background(menuBackground);
@@ -153,7 +141,6 @@ MyGame.gameModel = function(gameSpecs){
     let ballGraphic = graphics.Ball(ball, paddle);
     let levelTracker = graphics.Letters(levelTrack);
     let gameScoreDisplay = graphics.Letters(gameScore);
-    let livesDisplay = graphics.Letters(livesObj);
     let countDownGraphic = graphics.Letters(countDown);
     let countDownMode = true;
 
@@ -165,6 +152,20 @@ MyGame.gameModel = function(gameSpecs){
     //         columnj.push(level[i]);
     //     }
     // }
+
+    let restartLives = function(){
+        for (let i=0; i<3; ++i){
+            livesList.push(graphics.Rectangle({
+                rotation: 0,
+                x: CANVASWIDTH - (i+1)*100, 
+                y: CANVASHEIGHT - 30,
+                width: CANVASWIDTH/20,
+                height: CANVASHEIGHT/80,
+                fillStyle: paddle.fillStyle,
+                strokeStyle: paddle.strokeStyle
+            }));
+        }
+    }
 
     let updateTop5Graphics = function(){
         top5Graphics.length = 0;
@@ -192,7 +193,9 @@ MyGame.gameModel = function(gameSpecs){
         ballGraphic.draw();
         levelTracker.draw();
         gameScoreDisplay.draw();
-        livesDisplay.draw();
+        for (let i=0; i<livesList.length; ++i){
+            livesList[i].draw();
+        }
         for (let i=0; i<particleEffectGraphics.length; ++i){
             particleEffectGraphics[i].draw(particleEffects[i].particles);    
         }
@@ -371,7 +374,7 @@ MyGame.gameModel = function(gameSpecs){
         level.gapAbove = gapAbove;
         brickLevel = graphics.BrickLevel(level);
         lives = 3;
-        livesObj.text = 'Lives: ' + lives;
+        restartLives();
         levelCount = 1;
         score = 0;
         gameScore.text = "Score: " + score;
@@ -388,7 +391,7 @@ MyGame.gameModel = function(gameSpecs){
         score += 37*lives;
         gameScore.text = "Score: " + score;
         lives = 3;
-        livesObj.text = "Lives: " + lives;
+        restartLives();
         ++levelCount;
         levelTrack.text = "Level " + levelCount;
         score += 100;
@@ -417,7 +420,7 @@ MyGame.gameModel = function(gameSpecs){
         }
         if (!detectCollisionWithWall()){
             --lives;
-            livesObj.text = "Lives: " + lives;
+            livesList.pop();
             restartBall(ball, paddle);
             that.updateGame = countDownUpdate;
             countDownMode = true;
