@@ -228,7 +228,7 @@ MyGame.graphics = (function(){
     }
 
     /*
-    Ball creates a rectangle as a ball.
+    Ball creates a ball.
     */
     function Ball(ball, paddle){
         ball.rotation = 0;

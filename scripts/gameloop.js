@@ -61,6 +61,7 @@ MyGame.main = (function(graphics, breakerMaker, keyboard, mouse){
     keyboard.registerKey(KeyEvent['DOM_VK_RIGHT'], gameModel.movePaddleRight);
     keyboard.registerKey(KeyEvent['DOM_VK_LEFT'], gameModel.movePaddleLeft);
     keyboard.registerKey(KeyEvent['DOM_VK_ESCAPE'], gameModel.escape);
+    keyboard.registerKey(KeyEvent['DOM_VK_C'], gameModel.clearHighScores);
 
     mouse.registerMouseReleasedHandler(gameModel.menuSelection);
 

@@ -2,12 +2,20 @@ MyGame.gameModel = function(gameSpecs){
     let that = {};
     //Unpacking gameSpecs
     let paddle = gameSpecs.paddle;
-    paddle.width0 = paddle.width;
-    paddle.height0 = paddle.height;
     let ball = gameSpecs.ball;
     let colorList = gameSpecs.colorList;
     let background = gameSpecs.background;
     let menuBackground = gameSpecs.menuBackground;
+
+    paddle.width0 = paddle.width;
+    paddle.height0 = paddle.height;
+
+    ball.radius0 = ball.radius;
+    let startAngle = 2*Math.PI/5;
+    ball.xRate = ball.rate * Math.cos(startAngle);
+    ball.yRate = -1 * ball.rate * Math.sin(startAngle);
+    ball.xRate0 = ball.xRate;
+    ball.yRate0 = ball.yRate;
     
     let CANVASWIDTH = 1600;
     let CANVASHEIGHT = 1000;
@@ -24,12 +32,7 @@ MyGame.gameModel = function(gameSpecs){
     
     let level = breakerMaker.generateLevel(gameWidthInBricks, gameHeightInBricks, colorList);
     level.gapAbove = gapAbove;
-    ball.radius0 = ball.radius;
-    let startAngle = 2*Math.PI/5;
-    ball.xRate = ball.rate * Math.cos(startAngle);
-    ball.yRate = -1 * ball.rate * Math.sin(startAngle);
-    ball.xRate0 = ball.xRate;
-    ball.yRate0 = ball.yRate;
+    
     let countDownMode = true;
     
     let score = 0;
@@ -75,6 +78,17 @@ MyGame.gameModel = function(gameSpecs){
         baseline: 'top',
         x: CANVASWIDTH/2,
         y: 30
+    };
+
+    let clearHighScoresMessage = {
+        text: 'Press \'c\' to clear the high scores.',
+        font: '2em Courier', 
+        fill: true, 
+        fillStyle: colorList[1].stroke, 
+        align: 'center', 
+        baseline: 'bottom',
+        x: CANVASWIDTH/2,
+        y: CANVASHEIGHT - 30
     };
 
     let top5Graphics = [];
@@ -127,22 +141,22 @@ MyGame.gameModel = function(gameSpecs){
     
     let particleEffects = [];
     let particleEffectGraphics = [];
-    let ballList = [ball];
+    let ballList = [];
+    let ballGraphicsList = [];    
     
     //Game graphics members
     let menuGraphic = graphics.Menu(menu);
     let credits = graphics.Letters(creditText);
     let highScores = graphics.Letters(highScoreText);
     let menuBack = graphics.Background(menuBackground);
+    let clearScoresGraphic = graphics.Letters(clearHighScoresMessage);
     
     let back = graphics.Background(background);
     let brickLevel = graphics.BrickLevel(level);
     let paddleGraphic = graphics.Paddle(paddle);
-    let ballGraphic = graphics.Ball(ball, paddle);
     let levelTracker = graphics.Letters(levelTrack);
     let gameScoreDisplay = graphics.Letters(gameScore);
     let countDownGraphic = graphics.Letters(countDown);
-    let ballGraphicsList = [ballGraphic];
     let livesGraphicsList = [];
 
     //Building collision test groups by brick column
@@ -167,6 +181,24 @@ MyGame.gameModel = function(gameSpecs){
             }));
         }
     }
+
+    let addBall = function(){
+        let newBall = {
+            fillStyle: ball.fillStyle,
+            strokeStyle: ball.strokeStyle,
+            rate: ball.rate,
+            radius: ball.radius,
+            radius0: ball.radius0,
+            xRate: ball.xRate,
+            xRate0: ball.xRate0,
+            yRate: ball.yRate,
+            yRate0: ball.yRate0
+        }
+        ballList.push(newBall);
+        ballGraphicsList.push(graphics.Ball(ballList[ballList.length-1], paddle));
+    }
+
+    addBall();
 
     let updateTop5Graphics = function(){
         top5Graphics.length = 0;
@@ -225,6 +257,7 @@ MyGame.gameModel = function(gameSpecs){
         for (let i=0; i<top5Graphics.length; ++i){
             top5Graphics[i].draw();
         }
+        clearScoresGraphic.draw();
     }
 
     //START - beginning draw
@@ -355,10 +388,10 @@ MyGame.gameModel = function(gameSpecs){
     }
 
     function restartBall(){
-        ball.xRate = ball.xRate0;
-        ball.yRate = ball.yRate0;
-        ballGraphic = graphics.Ball(ball, paddle);
-        ball.centerX = paddle.x + paddle.width/2;
+        ballList[0].xRate = ballList[0].xRate0;
+        ballList[0].yRate = ballList[0].yRate0;
+        ballGraphic = graphics.Ball(ballList[0], paddle);
+        ballList[0].centerX = paddle.x + paddle.width/2;
     }
 
     function restartPaddle(){
@@ -370,7 +403,7 @@ MyGame.gameModel = function(gameSpecs){
 
     function newGame(){
         restartPaddle();
-        restartBall(ball, paddle);
+        restartBall();
         level = breakerMaker.generateLevel(gameWidthInBricks0, gameHeightInBricks0, colorList);
         level.gapAbove = gapAbove;
         brickLevel = graphics.BrickLevel(level);
@@ -388,7 +421,7 @@ MyGame.gameModel = function(gameSpecs){
     function nextLevel(){
         particleEffectGraphics.length = 0;
         particleEffects.length = 0;
-        ball.x = 1.5*CANVASWIDTH
+        ballList[i].x = 1.5*CANVASWIDTH
         score += 37*lives;
         gameScore.text = "Score: " + score;
         lives = 3;
@@ -467,7 +500,7 @@ MyGame.gameModel = function(gameSpecs){
         if (isInRightBound(paddle)){
             paddle.x += elapsedTime/1000 * paddle.rate;
             if (countDownMode){
-                ball.centerX += elapsedTime/1000 * paddle.rate;
+                ballList[0].centerX += elapsedTime/1000 * paddle.rate;
             }
         }
     }
@@ -476,7 +509,7 @@ MyGame.gameModel = function(gameSpecs){
         if (isInLeftBound(paddle)){
             paddle.x -= elapsedTime/1000 * paddle.rate;
             if (countDownMode){
-                ball.centerX -= elapsedTime/1000 * paddle.rate;
+                ballList[0].centerX -= elapsedTime/1000 * paddle.rate;
             }
         }
     }
@@ -516,6 +549,14 @@ MyGame.gameModel = function(gameSpecs){
         lives = 0;
         that.gameUpdate = menuUpdate;
         that.drawGame = drawMenu;
+    }
+
+    that.clearHighScores = function(){
+        for (let x=0; x<top5.length; ++x){
+            MyGame.persistence.remove(x);
+        }
+        top5.length = 0;
+        updateTop5Graphics();
     }
 
     return that;
