@@ -30,6 +30,7 @@ MyGame.gameModel = function(gameSpecs){
     ball.yRate = -1 * ball.rate * Math.sin(startAngle);
     ball.xRate0 = ball.xRate;
     ball.yRate0 = ball.yRate;
+    let countDownMode = true;
     
     let score = 0;
     let lives = 0;
@@ -112,8 +113,6 @@ MyGame.gameModel = function(gameSpecs){
         y: CANVASHEIGHT - 5
     };
 
-    let livesList = [];
-
     let countDown = {
         time: 0,
         text: '0',
@@ -125,16 +124,17 @@ MyGame.gameModel = function(gameSpecs){
         x: CANVASWIDTH/2,
         y: CANVASHEIGHT/2
     }
-
+    
     let particleEffects = [];
     let particleEffectGraphics = [];
-
+    let ballList = [ball];
+    
     //Game graphics members
     let menuGraphic = graphics.Menu(menu);
     let credits = graphics.Letters(creditText);
     let highScores = graphics.Letters(highScoreText);
     let menuBack = graphics.Background(menuBackground);
-
+    
     let back = graphics.Background(background);
     let brickLevel = graphics.BrickLevel(level);
     let paddleGraphic = graphics.Paddle(paddle);
@@ -142,7 +142,8 @@ MyGame.gameModel = function(gameSpecs){
     let levelTracker = graphics.Letters(levelTrack);
     let gameScoreDisplay = graphics.Letters(gameScore);
     let countDownGraphic = graphics.Letters(countDown);
-    let countDownMode = true;
+    let ballGraphicsList = [ballGraphic];
+    let livesGraphicsList = [];
 
     //Building collision test groups by brick column
     // let testGroups = [];
@@ -155,7 +156,7 @@ MyGame.gameModel = function(gameSpecs){
 
     let restartLives = function(){
         for (let i=0; i<3; ++i){
-            livesList.push(graphics.Rectangle({
+            livesGraphicsList.push(graphics.Rectangle({
                 rotation: 0,
                 x: CANVASWIDTH - (i+1)*100, 
                 y: CANVASHEIGHT - 30,
@@ -190,11 +191,13 @@ MyGame.gameModel = function(gameSpecs){
         back.draw();
         brickLevel.draw();
         paddleGraphic.draw();
-        ballGraphic.draw();
         levelTracker.draw();
         gameScoreDisplay.draw();
-        for (let i=0; i<livesList.length; ++i){
-            livesList[i].draw();
+        for (let i=0; i<livesGraphicsList.length; ++i){
+            livesGraphicsList[i].draw();
+        }
+        for (let i=0; i<ballGraphicsList.length; ++i){
+            ballGraphicsList[i].draw();
         }
         for (let i=0; i<particleEffectGraphics.length; ++i){
             particleEffectGraphics[i].draw(particleEffects[i].particles);    
@@ -245,12 +248,10 @@ MyGame.gameModel = function(gameSpecs){
         }
     }
     
-    let menuUpdate = function(elapsedTime){
-
-    }
+    let menuUpdate = function(elapsedTime){ }
     
     let gameModelUpdate = function(elapsedTime){
-        updateBall(elapsedTime);
+        updateBalls(elapsedTime);
         updateCollisions();
         for (let i=0; i<particleEffects.length; ++i){
             if (!particleEffects[i].update(elapsedTime)){
@@ -263,7 +264,7 @@ MyGame.gameModel = function(gameSpecs){
     //START - beginning update
     that.updateGame = menuUpdate;
     
-    function detectCollisionWithBrick(){
+    function detectCollisionWithBrick(ball1){
         let didHitBrick = false;
         let brickList = level.brickList;
         for (let i = (brickList.length-1); i >= 0; --i){
@@ -271,10 +272,10 @@ MyGame.gameModel = function(gameSpecs){
             brickY1 = 2/5 * brickUnit * brickList[i].y + gapAbove;
             brickX2 = brickUnit * (brickList[i].x + 1)
             brickY2 = 2/5 * brickUnit * (brickList[i].y + 1) + gapAbove;
-            ballX1 = ball.centerX - ball.radius;
-            ballY1 = ball.centerY - ball.radius;
-            ballX2 = ball.centerX + ball.radius;
-            ballY2 = ball.centerY + ball.radius;
+            ballX1 = ball1.centerX - ball1.radius;
+            ballY1 = ball1.centerY - ball1.radius;
+            ballX2 = ball1.centerX + ball1.radius;
+            ballY2 = ball1.centerY + ball1.radius;
 
             if (brickX1 < ballX2 && brickX2 > ballX1){
                 if (brickY1 < ballY2 && brickY2 > ballY1){
@@ -305,9 +306,9 @@ MyGame.gameModel = function(gameSpecs){
                     gameScore.text = 'Score: ' + score;
                     //Checking how to reflect the ball after hitting a brick
                     if (brickY1 > ballY1 || brickY2 < ballY2){
-                        ball.yRate *= -1;
+                        ball1.yRate *= -1;
                     }else{
-                        ball.xRate *= -1;
+                        ball1.xRate *= -1;
                     }
                 }
             }
@@ -315,39 +316,39 @@ MyGame.gameModel = function(gameSpecs){
         return didHitBrick;
     }
 
-    function detectCollisionWithPaddle(){
+    function detectCollisionWithPaddle(ball1){
         paddleCenterX = paddle.x + 1/2 * paddle.width;
         paddleX1 = paddle.x;
         paddleY1 = paddle.y;
         paddleX2 = paddle.x + paddle.width;
         paddleY2 = paddle.y + paddle.height;
-        ballX1 = ball.centerX - ball.radius;
-        ballY1 = ball.centerY - ball.radius;
-        ballX2 = ball.centerX + ball.radius;
-        ballY2 = ball.centerY + ball.radius;
+        ballX1 = ball1.centerX - ball1.radius;
+        ballY1 = ball1.centerY - ball1.radius;
+        ballX2 = ball1.centerX + ball1.radius;
+        ballY2 = ball1.centerY + ball1.radius;
 
         if (paddleX1 < ballX2 && paddleX2 > ballX1){
             if (paddleY1 < ballY2 && paddleY2 > ballY1){
-                let weight = 2 * (paddleCenterX - ball.centerX)/(paddle.width);
-                ball.xRate += paddle.reflectance * weight * ball.rate * -1;
-                ball.yRate *= -1;
+                let weight = 2 * (paddleCenterX - ball1.centerX)/(paddle.width);
+                ball1.xRate += paddle.reflectance * weight * ball1.rate * -1;
+                ball1.yRate *= -1;
             }
         }
     }
 
-    function detectCollisionWithWall(){
-        if (ball.centerX - ball.radius <= 0 && ball.xRate < 0){
-            ball.xRate *= -1;
+    function detectCollisionWithWall(ball1){
+        if (ball1.centerX - ball1.radius <= 0 && ball1.xRate < 0){
+            ball1.xRate *= -1;
         }
-        else if (ball.centerX + ball.radius >= CANVASWIDTH && ball.xRate > 0){
-            ball.xRate *= -1;
+        else if (ball1.centerX + ball1.radius >= CANVASWIDTH && ball1.xRate > 0){
+            ball1.xRate *= -1;
         }
-        if (ball.centerY - ball.radius <= 0 && ball.yRate < 0){
-            ball.yRate *= -1;
+        if (ball1.centerY - ball1.radius <= 0 && ball1.yRate < 0){
+            ball1.yRate *= -1;
         }
-        if (ball.centerY + ball.radius >= CANVASHEIGHT + 8*brickUnit){
+        if (ball1.centerY + ball1.radius >= CANVASHEIGHT + 8*brickUnit){
             //Uncomment to create a floor.
-            //ball.yRate *= -1;
+            //ball1.yRate *= -1;
             return false;
         }
         return true;
@@ -409,40 +410,49 @@ MyGame.gameModel = function(gameSpecs){
     }
 
     function updateCollisions(){
-        if (ball.centerY < gapAbove + 2/5 * brickUnit * (gameHeightInBricks + 1) + ball.radius){
-            if (detectCollisionWithBrick()){ 
-                if (level.brickList.length === 0){
-                    nextLevel();
+        for (let i=0; i<ballList.length; ++i){
+            if (ballList[i].centerY < gapAbove + 2/5 * brickUnit * (gameHeightInBricks + 1) + ballList[i].radius){
+                if (detectCollisionWithBrick(ballList[i])){ 
+                    if (level.brickList.length === 0){
+                        nextLevel();
+                    }
                 }
+            }else if (ballList[i].centerY > CANVASWIDTH - paddle.gapBelowPaddle - paddle.width*brickUnit){
+                detectCollisionWithPaddle(ballList[i]);
             }
-        }else if (ball.centerY > CANVASWIDTH - paddle.gapBelowPaddle - paddle.width*brickUnit){
-            detectCollisionWithPaddle();
-        }
-        if (!detectCollisionWithWall()){
-            --lives;
-            livesList.pop();
-            restartBall(ball, paddle);
-            that.updateGame = countDownUpdate;
-            countDownMode = true;
-            if (lives <= 0){
-                top5.push(score);
-                top5.sort(function(a,b){return b-a;})
-                top5.splice(5, 1);
-                for (let i=0; i<top5.length; ++i){
-                    MyGame.persistence.remove(i);
-                    MyGame.persistence.add(i, top5[i]);
+            if (!detectCollisionWithWall(ballList[i])){
+                if (ballList.length === 1){
+                    --lives;
+                    livesGraphicsList.pop();
+                    restartBall(ball, paddle);
+                    that.updateGame = countDownUpdate;
+                    countDownMode = true;
+                    if (lives <= 0){
+                        top5.push(score);
+                        top5.sort(function(a,b){return b-a;})
+                        top5.splice(5, 1);
+                        for (let x=0; x<top5.length; ++x){
+                            MyGame.persistence.remove(x);
+                            MyGame.persistence.add(x, top5[x]);
+                        }
+                        top5 = MyGame.persistence.retrieveHighScores();
+                        updateTop5Graphics();
+                        that.updateGame = menuUpdate;
+                        that.drawGame = drawMenu;
+                    }
+                }else{
+                    ballList.splice(i,1);
+                    ballGraphicsList.splice(i,1);
                 }
-                top5 = MyGame.persistence.retrieveHighScores();
-                updateTop5Graphics();
-                that.updateGame = menuUpdate;
-                that.drawGame = drawMenu;
             }
         }
     }
     
-    function updateBall(elapsedTime){
-        ball.centerX += ball.xRate * elapsedTime/1000;
-        ball.centerY += ball.yRate * elapsedTime/1000;
+    function updateBalls(elapsedTime){
+        for (let i=0; i<ballList.length; ++i){
+            ballList[i].centerX += ballList[i].xRate * elapsedTime/1000;
+            ballList[i].centerY += ballList[i].yRate * elapsedTime/1000;
+        }
     }
 
     function isInRightBound(object){
