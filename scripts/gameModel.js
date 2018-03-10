@@ -22,7 +22,7 @@ MyGame.gameModel = function(gameSpecs){
     let graphics = MyGame.graphics;
     let breakerMaker = MyGame.breakerMaker;
     let particleSystem = MyGame.particleSystem;
-    let gameWidthInBricks = 18;
+    let gameWidthInBricks = 10;
     let gameHeightInBricks = 8;
     let gameWidthInBricks0 = gameWidthInBricks;
     let gameHeightInBricks0 = gameHeightInBricks;
@@ -169,8 +169,9 @@ MyGame.gameModel = function(gameSpecs){
     // }
 
     let restartLives = function(){
+        lives = 2;        
         livesGraphicsList.length = 0;
-        for (let i=0; i<3; ++i){
+        for (let i=0; i<lives; ++i){
             livesGraphicsList.push(graphics.Rectangle({
                 rotation: 0,
                 x: CANVASWIDTH - (i+1)*100, 
@@ -286,6 +287,7 @@ MyGame.gameModel = function(gameSpecs){
     
     let gameModelUpdate = function(elapsedTime){
         let score0 = score;
+        let levelCount0 = levelCount;
         updateBalls(elapsedTime);
         updateCollisions();
         for (let i=0; i<particleEffects.length; ++i){
@@ -294,7 +296,7 @@ MyGame.gameModel = function(gameSpecs){
                 particleEffectGraphics.splice(i,1);
             }
         }
-        if (Math.floor(score0/100) !== Math.floor(score/100)){
+        if (Math.floor(score0/100) !== Math.floor(score/100) && levelCount0 == levelCount){
             addBall();
             ballList[ballList.length-1].centerX = paddle.x + paddle.width/2;
         }
@@ -318,7 +320,6 @@ MyGame.gameModel = function(gameSpecs){
 
             if (brickX1 < ballX2 && brickX2 > ballX1){
                 if (brickY1 < ballY2 && brickY2 > ballY1){
-                    console.log('detected brick collision');
                     score += brickList[i].points;
                     //Explode brick
                     particleEffects.push(particleSystem.AreaDissolveEffect({
@@ -413,7 +414,6 @@ MyGame.gameModel = function(gameSpecs){
         level = breakerMaker.generateLevel(gameWidthInBricks0, gameHeightInBricks0, colorList);
         level.gapAbove = gapAbove;
         brickLevel = graphics.BrickLevel(level);
-        lives = 3;
         restartLives();
         levelCount = 1;
         score = 0;
@@ -425,20 +425,6 @@ MyGame.gameModel = function(gameSpecs){
     }
 
     function nextLevel(){
-        particleEffectGraphics.length = 0;
-        particleEffects.length = 0;
-        score += 37*lives;
-        gameScore.text = "Score: " + score;
-        lives = 3;
-        restartLives();
-        ++levelCount;
-        levelTrack.text = "Level " + levelCount;
-        score += 100;
-        restartPaddle();
-        ballList.length = 0;
-        ballGraphicsList.length = 0;
-        addBall();
-        restartBall();
         gameWidthInBricks += 3;
         gameHeightInBricks += 1;
         brickUnit = CANVASWIDTH/gameWidthInBricks;
@@ -447,6 +433,19 @@ MyGame.gameModel = function(gameSpecs){
         brickLevel = graphics.BrickLevel(level);
         that.updateGame = countDownUpdate;
         countDownMode = true;
+
+        particleEffectGraphics.length = 0;
+        particleEffects.length = 0;
+        score += 37*lives;
+        score += 100;
+        gameScore.text = "Score: " + score;
+        ++levelCount;
+        levelTrack.text = "Level " + levelCount;
+        restartLives();
+        restartPaddle();
+        ballList.length = 1;
+        ballGraphicsList.length = 0;
+        restartBall();
         console.log('Level ' + levelCount );
     }
 
