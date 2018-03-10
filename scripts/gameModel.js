@@ -22,7 +22,7 @@ MyGame.gameModel = function(gameSpecs){
     let graphics = MyGame.graphics;
     let breakerMaker = MyGame.breakerMaker;
     let particleSystem = MyGame.particleSystem;
-    let gameWidthInBricks = 10;
+    let gameWidthInBricks = 18;
     let gameHeightInBricks = 8;
     let gameWidthInBricks0 = gameWidthInBricks;
     let gameHeightInBricks0 = gameHeightInBricks;
@@ -36,6 +36,7 @@ MyGame.gameModel = function(gameSpecs){
     let countDownMode = true;
     
     let score = 0;
+    let bricksRemoved = 0;
     let lives = 0;
     let levelCount = 1;
 
@@ -169,9 +170,9 @@ MyGame.gameModel = function(gameSpecs){
     // }
 
     let restartLives = function(){
-        lives = 2;        
+        lives = 3;        
         livesGraphicsList.length = 0;
-        for (let i=0; i<lives; ++i){
+        for (let i=0; i<lives-1; ++i){
             livesGraphicsList.push(graphics.Rectangle({
                 rotation: 0,
                 x: CANVASWIDTH - (i+1)*100, 
@@ -313,10 +314,10 @@ MyGame.gameModel = function(gameSpecs){
             brickY1 = 2/5 * brickUnit * brickList[i].y + gapAbove;
             brickX2 = brickUnit * (brickList[i].x + 1)
             brickY2 = 2/5 * brickUnit * (brickList[i].y + 1) + gapAbove;
-            ballX1 = ball1.centerX - ball1.radius;
-            ballY1 = ball1.centerY - ball1.radius;
-            ballX2 = ball1.centerX + ball1.radius;
-            ballY2 = ball1.centerY + ball1.radius;
+            ballX1 = ball1.centerX - .9*ball1.radius;
+            ballY1 = ball1.centerY - .9*ball1.radius;
+            ballX2 = ball1.centerX + .9*ball1.radius;
+            ballY2 = ball1.centerY + .9*ball1.radius;
 
             if (brickX1 < ballX2 && brickX2 > ballX1){
                 if (brickY1 < ballY2 && brickY2 > ballY1){
@@ -344,12 +345,29 @@ MyGame.gameModel = function(gameSpecs){
                     level.rectangleList.splice(i,1);
                     didHitBrick = true;
                     gameScore.text = 'Score: ' + score;
+                    ++bricksRemoved;
+                    if (bricksRemoved === 4 || bricksRemoved === 12 || bricksRemoved === 36 || bricksRemoved === 62){
+                        for (let j=0; j < ballList.length; ++j){
+                            ballList[j].xRate > 0 ? ballList[j].xRate += levelCount * Math.abs(ball.xRate0/10) : ballList[j].xRate -= levelCount * Math.abs(ball.xRate0/10);
+                        }
+                        for (let j=0; j < ballList.length; ++j){
+                            ballList[j].yRate > 0 ? ballList[j].yRate += levelCount * Math.abs(ball.yRate0/10) : ballList[j].yRate -= levelCount * Math.abs(ball.yRate0/10);
+                        }
+                    }
                     //Checking how to reflect the ball after hitting a brick
-                    if (brickY1 > ballY1 || brickY2 < ballY2){
+                    if (ball1.centerY < brickY2 && ball1.yRate > 0){
                         ball1.yRate *= -1;
-                    }else{
+                    }
+                    else if (ball1.centerY > brickY1 && ball1.yRate < 0){
+                        ball1.yRate *= -1;
+                    }
+                    else if (ball1.centerX < brickX1 && ball1.xRate > 0){
                         ball1.xRate *= -1;
                     }
+                    else if (ball1.centerX > brickX2 && ball1.xRate < 0){
+                        ball1.xRate *= -1;
+                    }
+                    // return didHitBrick; //Uncomment to allow only one collision per frame.
                 }
             }
         }
@@ -395,6 +413,7 @@ MyGame.gameModel = function(gameSpecs){
     }
 
     function restartBall(){
+        bricksRemoved = 0;                
         ballList[0].xRate = ballList[0].xRate0;
         ballList[0].yRate = ballList[0].yRate0;
         ballGraphicsList[0] = graphics.Ball(ballList[0], paddle);
