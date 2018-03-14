@@ -585,6 +585,10 @@ MyGame.gameModel = function(gameSpecs){
         lives = 0;
         that.gameUpdate = menuUpdate;
         that.drawGame = drawMenu;
+        for (let i=0; i<ballList.length; ++i){
+            ballList[i].xRate = 0;
+            ballList[i].yRate = 0;
+        }
     }
 
     that.clearHighScores = function(){
